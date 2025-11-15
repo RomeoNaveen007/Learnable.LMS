@@ -49,7 +49,7 @@ namespace Learnable.Application.Features.Verifications.Commands.SendOtp
             string body = $"<h2>Your OTP Code is: <b>{otpCode}</b></h2>";
             await _emailService.SendAsync(request.Email, subject, body, cancellationToken);
 
-            return true;
+             return true;
         }
     }
 }
