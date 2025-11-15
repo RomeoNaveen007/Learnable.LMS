@@ -11,7 +11,7 @@ namespace Learnable.WebApi.Controllers
     {
         private readonly IMediator _mediator = mediator;
 
-        [HttpPost("send-otp")] // https://localhost:7180/Account/send-otp
+        [HttpPost("send-otp")] //  http://localhost:5071/api/Account/send-otp
         public async Task<IActionResult> SendOtp([FromBody] SendOtpDto request)
         {
             var result = await _mediator.Send(new SendOtpCommand(request.Email));
@@ -23,7 +23,7 @@ namespace Learnable.WebApi.Controllers
             });
         }
 
-        [HttpPost("register")] // https://localhost:7180/Account/register
+        [HttpPost("register")] //  http://localhost:5071/api/Account/register
         public async Task<IActionResult> Register([FromBody] RegisterUserRequest request)
         {
             var result = await _mediator.Send(new RegisterUserCommand(request.User, request.Otp));

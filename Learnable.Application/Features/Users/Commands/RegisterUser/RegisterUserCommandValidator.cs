@@ -19,7 +19,7 @@ namespace Learnable.Application.Features.Users.Commands.RegisterUser
             .MaximumLength(100)
             .When(x => !string.IsNullOrEmpty(x.Dto.DisplayName));
 
-            RuleFor(x => x.Dto.FullName)
+            RuleFor(x => x.Dto.FullName)    
                 .MaximumLength(100);
 
             RuleFor(x => x.OtpCode)
