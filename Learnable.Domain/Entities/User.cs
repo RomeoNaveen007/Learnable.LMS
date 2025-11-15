@@ -27,13 +27,13 @@ public partial class User
     public string PasswordHash { get; set; } = null!;
 
     [StringLength(255)]
-    public string Salt { get; set; } = null!;
+    public string PasswordSalt { get; set; } = null!;
 
     [StringLength(50)]
     public string Role { get; set; } = null!;
 
     [StringLength(100)]
-    public string? Name { get; set; }
+    public string? FullName { get; set; }
 
     public bool? IsActive { get; set; }
 

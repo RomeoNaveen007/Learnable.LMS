@@ -1,4 +1,7 @@
-﻿using Learnable.Domain.Entities;
+﻿using Learnable.Domain.Common.Email;
+using Learnable.Domain.Common.OTP;
+using Learnable.Domain.Entities;
+using Learnable.Domain.Errors;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -8,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Learnable.Infrastructure.Persistence.Data
 {
-    internal partial class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
+    public partial class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
     {
         public virtual DbSet<Asset> Assets { get; set; }
 
@@ -33,6 +36,9 @@ namespace Learnable.Infrastructure.Persistence.Data
         public virtual DbSet<Teacher> Teachers { get; set; }
 
         public virtual DbSet<User> Users { get; set; }
+        public DbSet<UserOtp> UserOtps { get; set; } = null!;
+        public DbSet<SmtpSetting> SmtpSettings { get; set; }
+        public DbSet<ApiException> ApiExceptions { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             //    #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
