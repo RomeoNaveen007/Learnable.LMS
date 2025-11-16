@@ -47,9 +47,12 @@ namespace Learnable.Application.Features.Verifications.Commands.SendOtp
             // Send OTP email
             string subject = "Your OTP Code";
             string body = $"<h2>Your OTP Code is: <b>{otpCode}</b></h2>";
-            await _emailService.SendAsync(request.Email, subject, body, cancellationToken);
+            var emailSent = await _emailService.SendAsync(request.Email, subject, body, cancellationToken);
 
-             return true;
+            if (!emailSent)
+                return false;
+
+            return true;
         }
     }
 }
