@@ -23,12 +23,12 @@ namespace Learnable.Infrastructure.Implementations.Services.Internal
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public Task SendAsync(string toEmail, string subject, string htmlBody, CancellationToken cancellationToken = default)
+        public Task<bool> SendAsync(string toEmail, string subject, string htmlBody, CancellationToken cancellationToken = default)
         {
             return SendAsync(new[] { toEmail }, subject, htmlBody, cancellationToken);
         }
 
-        public async Task SendAsync(IEnumerable<string> toEmails, string subject, string htmlBody, CancellationToken cancellationToken = default)
+        public async Task<bool> SendAsync(IEnumerable<string> toEmails, string subject, string htmlBody, CancellationToken cancellationToken = default)
         {
             var message = new MimeMessage();
 
@@ -54,7 +54,18 @@ namespace Learnable.Infrastructure.Implementations.Services.Internal
                 // Choose SecureSocketOptions depending on your port and server
                 var secure = _settings.UseSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.Auto;
 
-                await client.ConnectAsync(_settings.Host, _settings.Port, secure, cancellationToken);
+                try
+                {
+                    // ❗ CONNECTION EXCEPTION HANDLED HERE
+                    await client.ConnectAsync(_settings.Host, _settings.Port, secure, cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "SMTP connection failed. Host: {Host}", _settings.Host);
+
+                    // Do NOT throw → prevents application crash
+                    return false;
+                }
 
                 if (!string.IsNullOrWhiteSpace(_settings.Username))
                 {
@@ -65,12 +76,29 @@ namespace Learnable.Infrastructure.Implementations.Services.Internal
                 await client.DisconnectAsync(true, cancellationToken);
 
                 _logger.LogInformation("Email successfully sent to {Recipients}", string.Join(", ", toEmails));
+
+                return true;
+
+            }
+
+            catch (SmtpCommandException ex)
+            {
+                // Gmail sending limit exceeded
+                if (ex.Message.Contains("5.4.5"))
+                {
+                    _logger.LogError("Gmail sending limit exceeded. Try again after 24 hours.");
+                    return false; // do not crash the app
+                }
+
+                _logger.LogError(ex, "SMTP command error");
+                return false;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to send email to {To}", string.Join(", ", toEmails ?? Array.Empty<string>()));
-                throw;
+                _logger.LogError(ex, "Unexpected email error");
+                return false;
             }
+
         }
     }
 }

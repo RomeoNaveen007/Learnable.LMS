@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Learnable.Application.Features.Verifications.Commands.SendOtp
 {
-    public class SendOtpValidator : AbstractValidator<SendOtpCommand>
+    public class SendOtpValidator : AbstractValidator<SendOtpDto>
     {
         public SendOtpValidator()
         {
