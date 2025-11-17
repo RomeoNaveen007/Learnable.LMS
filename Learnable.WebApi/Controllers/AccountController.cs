@@ -25,7 +25,7 @@ namespace Learnable.WebApi.Controllers
             return Ok(new
             {
                 message = "OTP sent successfully",
-                success = result
+                success = result    
             });
         }
 
