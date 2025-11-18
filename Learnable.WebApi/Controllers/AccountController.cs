@@ -1,8 +1,10 @@
 ﻿using Learnable.Application.Features.Users.Commands.RegisterUser;
+using Learnable.Application.Features.Users.Queries.LoginUser;
 using Learnable.Application.Features.Verifications.Commands.SendOtp;
 using Learnable.Domain.Common.OTP;
 using Learnable.WebApi.Requests;
 using MediatR;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Learnable.WebApi.Controllers
@@ -36,5 +38,15 @@ namespace Learnable.WebApi.Controllers
 
             return Ok(result);
         }
+
+        [HttpPost("login")]   //  http://localhost:5071/api/Account/login
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        {
+            var query = new LoginQuery(request.Email, request.Password);
+            var result = await _mediator.Send(query);
+
+            return Ok(result);
+        }
+
     }
 }

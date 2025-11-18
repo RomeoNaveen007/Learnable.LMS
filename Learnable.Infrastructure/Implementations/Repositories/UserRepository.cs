@@ -38,5 +38,9 @@ namespace Learnable.Infrastructure.Implementations.Repositories
         {
             return await _context.Users.AnyAsync(u => u.Username == username, cancellationToken);
         }
+        public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+        }
     }
 }
