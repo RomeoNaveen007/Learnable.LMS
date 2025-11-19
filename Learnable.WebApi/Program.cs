@@ -1,8 +1,13 @@
 using Learnable.Application.Features.Users.Commands.RegisterUser;
+using Learnable.Application.Interfaces.Repositories.Generic;
+using Learnable.Application.Interfaces.Services;
 using Learnable.Infrastructure;
+using Learnable.Infrastructure.Persistence.Data;
 using Learnable.WebApi.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,11 +24,8 @@ builder.Services.AddInfrastructureDb(builder.Configuration);
 builder.Services.AddMediatR(cfg =>
                cfg.RegisterServicesFromAssembly(typeof(RegisterUserCommand).Assembly));
 
-builder.Services.AddCors(policy =>
-                policy.AddDefaultPolicy(options =>
-                    options.AllowAnyHeader()
-                           .AllowAnyMethod()
-                           .WithOrigins("http://localhost:4200", "https://localhost:4200")));
+builder.Services.AddCors();
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options => // Configure the JWT bearer authentication options. This will specify how the JWT token should be validated and used for authentication.
@@ -50,6 +52,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<ExceptionMiddleware>();
+app.UseCors(policy =>
+    policy.AllowAnyHeader()
+          .AllowAnyMethod()
+          .WithOrigins("http://localhost:4200", "https://localhost:4200"));
 
 //app.UseHttpsRedirection();
 
@@ -60,5 +66,15 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+    var passwordService = scope.ServiceProvider.GetRequiredService<IPasswordService>();
+
+    await db.Database.MigrateAsync();
+    await Seed.SeedUser(db, unitOfWork, passwordService);
+}
 
 app.Run();
