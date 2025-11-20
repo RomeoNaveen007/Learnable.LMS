@@ -59,6 +59,9 @@ namespace Learnable.Infrastructure
                 cfg.RegisterServicesFromAssembly(typeof(LoginQueryHandler).Assembly);
             });
 
+            services.AddTransient<Seed>();
+
+
             return services;
         }
     }
