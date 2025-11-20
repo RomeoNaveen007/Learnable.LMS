@@ -1,0 +1,47 @@
+[
+  {
+    "UserId": "d3b9a1ef-8f7e-4f0b-b8a1-4c92fbb77c10",
+    "Email": "admin@gmail.com",
+    "Username": "admin@learnable.com",
+    "DisplayName": "Admin",
+    "FullName": "System Administrator",
+    "Role": "Admin",
+    "Token": ""
+  },
+  {
+    "UserId": "a1f23db6-45e1-4c5f-9fa2-c5b5f8e6ab77",
+    "Email": "sureshkirusthiya@gmail.com",
+    "Username": "Diya",
+    "DisplayName": "Kirusthiya Suresh",
+    "FullName": "Kirusthiya Suresh",
+    "Role": "Student",
+    "Token": ""
+  },
+  {
+    "UserId": "7c2e4a56-9b5b-4d48-9fce-e3e70db4401c",
+    "Email": "lecturer1@learnable.com",
+    "Username": "lecturer1@learnable.com",
+    "DisplayName": "Lecturer One",
+    "FullName": "Dr. Priya Raman",
+    "Role": "Lecturer",
+    "Token": ""
+  },
+  {
+    "UserId": "bf0840e4-77ad-4d45-8b89-0c5fe6e25a53",
+    "Email": "staff1@learnable.com",
+    "Username": "staff1@learnable.com",
+    "DisplayName": "Staff One",
+    "FullName": "Anjali Devi",
+    "Role": "Staff",
+    "Token": ""
+  },
+  {
+    "UserId": "5a8f0b77-09cb-44c0-9d3b-45cc39a219df",
+    "Email": "student2@learnable.com",
+    "Username": "student2@learnable.com",
+    "DisplayName": "Student Two",
+    "FullName": "Sanjay R",
+    "Role": "Student",
+    "Token": ""
+  }
+]
