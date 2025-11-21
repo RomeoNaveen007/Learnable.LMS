@@ -1,4 +1,6 @@
-﻿using Learnable.Application.Interfaces.Repositories;
+﻿using Learnable.Application.Common.Dtos;
+using Learnable.Application.Common.Extensions;
+using Learnable.Application.Interfaces.Repositories;
 using Learnable.Application.Interfaces.Services;
 using MediatR;
 using System;
@@ -43,19 +45,8 @@ namespace Learnable.Application.Features.Users.Queries.LoginUser
             if (!isPasswordValid)
                 throw new Exception("Invalid email or password.");
 
-            // Generate JWT Token
-            var token = _tokenService.CreateToken(user);
-
-            return new UserDto
-        {
-            UserId = user.UserId,
-            Email = user.Email,
-            Username = user.Username,
-            DisplayName = user.DisplayName,
-            FullName = user.FullName,
-            Role = user.Role,
-            Token = token
-        };
+            // return dto
+            return user.ToDto(_tokenService);
         }
     }
 }

@@ -18,6 +18,7 @@ namespace Learnable.Infrastructure.Implementations.Services.Internal
         {
             var claims = new List<Claim>
             {
+                new(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                 new(ClaimTypes.Email, user.Email ?? string.Empty),
                 new("DisplayName", user.DisplayName ?? string.Empty)
             };
