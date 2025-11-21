@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Learnable.Application.Features.Users
+namespace Learnable.Application.Common.Dtos
 {
     public class UserDto
     {
