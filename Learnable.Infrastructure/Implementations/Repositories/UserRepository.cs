@@ -42,15 +42,9 @@ namespace Learnable.Infrastructure.Implementations.Repositories
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
         }
-        public async Task<User?> GetUserForUpdateAsync(string id)
+        public async Task<User?> GetUserByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            // Safely parse the string into a Guid
-            if (!Guid.TryParse(id, out var userId))
-                return null;
-
-            // Query the Users DbSet for the matching Id
-            return await _context.Users
-                .SingleOrDefaultAsync(x => x.UserId == userId);
+            return await _context.Users.SingleOrDefaultAsync(x => x.UserId == id, cancellationToken);
         }
 
     }

@@ -11,7 +11,7 @@ namespace Learnable.Domain.Entities;
 public partial class Teacher
 {
     [Key]
-    public Guid ProfileId { get; set; }
+    public Guid ProfileId { get; set; }  // teacherid
 
     public Guid? UserId { get; set; }
 
@@ -20,7 +20,7 @@ public partial class Teacher
     [StringLength(20)]
     public string? ContactPhone { get; set; }
 
-    public string? Bio { get; set; }
+    public string? Bio { get; set; }  // string to keep
 
     [StringLength(255)]
     public string? AvatarUrl { get; set; }
