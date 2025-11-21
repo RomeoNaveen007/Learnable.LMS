@@ -17,6 +17,6 @@ namespace Learnable.Application.Interfaces.Repositories
         Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken);
         Task<bool> ExistsByUsernameAsync(string username, CancellationToken cancellationToken);
         Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken);
-        Task<User?> GetUserForUpdateAsync(string id);
+        Task<User?> GetUserByIdAsync(Guid id, CancellationToken cancellationToken);
     }
 }

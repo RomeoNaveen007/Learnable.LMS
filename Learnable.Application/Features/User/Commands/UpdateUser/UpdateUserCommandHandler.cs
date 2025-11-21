@@ -23,7 +23,7 @@ namespace Learnable.Application.Features.User.Commands.UpdateUser
         }
         public async Task<UserDto?> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.GetByIdAsync(u => u.UserId == request.UserId);
+            var user = await _userRepository.GetUserByIdAsync(request.UserId, cancellationToken);
            
             if (user == null)
                 return null;
