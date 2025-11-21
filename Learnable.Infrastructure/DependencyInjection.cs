@@ -46,6 +46,9 @@ namespace Learnable.Infrastructure
             // User Repository
             services.AddScoped<IUserRepository, UserRepository>();
 
+            // Class Repository
+            services.AddScoped<IClassRepository, ClassRepository>();
+
             // Pipeline behaviors
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ExceptionBehavior<,>));
