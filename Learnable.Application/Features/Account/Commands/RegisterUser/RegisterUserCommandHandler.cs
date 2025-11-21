@@ -1,4 +1,5 @@
-﻿using Learnable.Application.Features.Users;
+﻿using Learnable.Application.Common.Dtos;
+using Learnable.Application.Common.Extensions;
 using Learnable.Application.Features.Users.Commands.RegisterUser;
 using Learnable.Application.Interfaces.Repositories;
 using Learnable.Application.Interfaces.Repositories.Generic;
@@ -115,15 +116,7 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, U
         var token = _tokenService.CreateToken(user);
 
         // return dto
-        return new UserDto
-        {
-            UserId = user.UserId,
-            Email = user.Email,
-            Username = user.Username,
-            DisplayName = user.DisplayName,
-            FullName = user.FullName,
-            Role = user.Role,
-            Token = token
-        };
+        return user.ToDto(_tokenService);
+            
     }
 }

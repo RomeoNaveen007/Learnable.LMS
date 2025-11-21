@@ -13,6 +13,6 @@ namespace Learnable.Application.Interfaces.Repositories.Generic
         Task DeleteAsync(T entity);
         Task<IEnumerable<T>> GetAllAsync();
         Task<T?> GetByIdAsync(Expression<Func<T, bool>> condition);
-
+        Task<T> UpdateAsync(T entity);
     }
 }

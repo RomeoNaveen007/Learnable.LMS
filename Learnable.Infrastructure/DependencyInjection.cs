@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Learnable.Application.Behaviors;
+using Learnable.Application.Common.Behaviors;
 using Learnable.Application.Features.Users.Queries.LoginUser;
 using Learnable.Application.Interfaces.Repositories;
 using Learnable.Application.Interfaces.Repositories.Generic;

@@ -19,6 +19,12 @@ namespace Learnable.Infrastructure.Implementations.Repositories.Generic
             var result = await context.Set<T>().AddAsync(entity);
             return result.Entity;
         }
+        public async Task<T> UpdateAsync(T entity)
+        {
+            var tracked = context.Set<T>().Update(entity);
+            await Task.CompletedTask;
+            return tracked.Entity;
+        }
 
         public async Task DeleteAsync(T entity)
         {
