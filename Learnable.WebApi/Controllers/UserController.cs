@@ -19,7 +19,7 @@ namespace Learnable.WebApi.Controllers
         public async Task<ActionResult> UpdateUser(UpdateUserCommand command)
         {
             var userId = User.GetUserId();
-            command.UserId = Guid.Parse(userId);
+            command.UserId = userId ;
 
             var result = await _mediator.Send(command);
 
