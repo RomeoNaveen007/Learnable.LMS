@@ -1,4 +1,5 @@
 ﻿using Learnable.Application.Common.Extensions;
+using Learnable.Application.Features.Teacher.Commands.DeleteTeacher;
 using Learnable.Application.Features.Teacher.Commands.UpdateTeacher;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -25,6 +26,19 @@ namespace Learnable.WebApi.Controllers
             {
                 message = "Teacher updated successfully"
             });
+        }
+
+        [HttpDelete("{profileId:guid}")]   // http://localhost:5071/api/teacher/id
+        public async Task<ActionResult> DeleteTeacher(Guid profileId)
+        {
+            var userId = User.GetUserId();
+
+            var result = await _mediator.Send(new DeleteTeacherCommand(userId));
+
+            if (!result)
+                return NotFound("Teacher not found or you are not authorized to delete this teacher");
+
+            return Ok(new { message = "Teacher deleted successfully" });
         }
     }
 }
