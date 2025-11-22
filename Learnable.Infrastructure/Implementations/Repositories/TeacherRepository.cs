@@ -19,11 +19,11 @@ namespace Learnable.Infrastructure.Implementations.Repositories
         {
             this.context = context;
         }
-        public async Task<Teacher?> GetTeacherWithUserAsync(Guid profileId, CancellationToken cancellationToken)
+        public async Task<Teacher?> GetTeacherWithUserAsync(Guid userId, CancellationToken cancellationToken)
         {
             return await context.Teachers
-                .Include(t => t.User)
-                .FirstOrDefaultAsync(t => t.ProfileId == profileId, cancellationToken);
+                .Where(t => t.UserId == userId)
+                .FirstOrDefaultAsync(cancellationToken);
         }
     }
 }

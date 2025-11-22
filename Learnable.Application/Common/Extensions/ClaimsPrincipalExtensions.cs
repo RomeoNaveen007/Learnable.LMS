@@ -10,10 +10,13 @@ namespace Learnable.Application.Common.Extensions
 {
     public static class ClaimsPrincipalExtensions
     {
-        public static string GetUserId(this ClaimsPrincipal user)
+        public static Guid GetUserId(this ClaimsPrincipal user)
         {
-            return user.FindFirstValue(ClaimTypes.NameIdentifier)
-                ?? throw new Exception("No NameIdentifier claim present (Cannot get UserId)");
+            var id = user.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (id == null)
+                throw new Exception("No NameIdentifier claim present (Cannot get UserId)");
+
+            return Guid.Parse(id);
         }
     }
 }
