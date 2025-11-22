@@ -18,10 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Class\Commands\DeleteClass\" />
-    <Folder Include="Features\Class\Commands\UpdateClass\" />
-    <Folder Include="Features\Class\Queries\GetAll\" />
-    <Folder Include="Features\Class\Queries\GetByID\" />
+    
   </ItemGroup>
 
 </Project>
