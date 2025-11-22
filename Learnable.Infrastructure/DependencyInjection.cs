@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Learnable.Application.Common.Behaviors;
+using Learnable.Application.Features.Account.Commands.RegisterTeacher;
 using Learnable.Application.Features.Users.Queries.LoginUser;
 using Learnable.Application.Interfaces.Repositories;
 using Learnable.Application.Interfaces.Repositories.Generic;
@@ -46,21 +47,22 @@ namespace Learnable.Infrastructure
             // User Repository
             services.AddScoped<IUserRepository, UserRepository>();
 
+            // Teacher Repository
+            services.AddScoped<ITeacherRepository, TeacherRepository>();
+
             // Pipeline behaviors
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ExceptionBehavior<,>));
 
             // FluentValidation
             services.AddValidatorsFromAssembly(typeof(LoginQueryValidator).Assembly);
-
+           
             // MediatR Handlers
             services.AddMediatR(cfg =>
             {
-                cfg.RegisterServicesFromAssembly(typeof(LoginQueryHandler).Assembly);
+                cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly);
             });
-
             services.AddTransient<Seed>();
-
 
             return services;
         }
