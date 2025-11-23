@@ -23,5 +23,15 @@ namespace Learnable.Infrastructure.Implementations.Repositories
                 .Include(x => x.Repositories)
                 .FirstOrDefaultAsync(x => x.ClassId == classId, cancellationToken);
         }
+
+        public async Task<IEnumerable<Class>> GetAllClassesWithIncludesAsync(CancellationToken cancellationToken)
+        {
+            return await _context.Classes
+                .Include(x => x.Teacher)
+                .Include(x => x.ClassStudents)
+                    .ThenInclude(cs => cs.Student)
+                .Include(x => x.Repositories)
+                .ToListAsync(cancellationToken);
+        }
     }
 }
