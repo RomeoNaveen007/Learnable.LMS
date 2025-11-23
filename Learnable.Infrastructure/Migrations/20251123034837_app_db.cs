@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Learnable.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class First : Migration
+    public partial class app_db : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -229,28 +229,6 @@ namespace Learnable.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Repository",
-                columns: table => new
-                {
-                    RepoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ClassId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    RepoName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    RepoDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RepoCertification = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "(getdate())"),
-                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true, defaultValue: "Active")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Repository", x => x.RepoId);
-                    table.ForeignKey(
-                        name: "FK_Repository_Class_ClassId",
-                        column: x => x.ClassId,
-                        principalTable: "Class",
-                        principalColumn: "ClassId");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Assets",
                 columns: table => new
                 {
@@ -266,11 +244,59 @@ namespace Learnable.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Assets", x => x.AssetsProfileId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Ocr_Skans",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AssetId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OcrText = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AssetsProfileId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Ocr_Skans", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Assets_Repository_RepoId",
-                        column: x => x.RepoId,
-                        principalTable: "Repository",
-                        principalColumn: "RepoId");
+                        name: "FK_Ocr_Skans_Assets_AssetId",
+                        column: x => x.AssetId,
+                        principalTable: "Assets",
+                        principalColumn: "AssetsProfileId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Ocr_Skans_Assets_AssetsProfileId",
+                        column: x => x.AssetsProfileId,
+                        principalTable: "Assets",
+                        principalColumn: "AssetsProfileId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Repository",
+                columns: table => new
+                {
+                    RepoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ClassId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    RepoName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    RepoDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RepoCertification = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "(getdate())"),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true, defaultValue: "Active"),
+                    AssetsProfileId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Repository", x => x.RepoId);
+                    table.ForeignKey(
+                        name: "FK_Repository_Assets_AssetsProfileId",
+                        column: x => x.AssetsProfileId,
+                        principalTable: "Assets",
+                        principalColumn: "AssetsProfileId");
+                    table.ForeignKey(
+                        name: "FK_Repository_Class_ClassId",
+                        column: x => x.ClassId,
+                        principalTable: "Class",
+                        principalColumn: "ClassId");
                 });
 
             migrationBuilder.CreateTable(
@@ -361,6 +387,21 @@ namespace Learnable.Infrastructure.Migrations
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Ocr_Skans_AssetId",
+                table: "Ocr_Skans",
+                column: "AssetId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Ocr_Skans_AssetsProfileId",
+                table: "Ocr_Skans",
+                column: "AssetsProfileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Repository_AssetsProfileId",
+                table: "Repository",
+                column: "AssetsProfileId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Repository_ClassId",
                 table: "Repository",
                 column: "ClassId");
@@ -405,16 +446,24 @@ namespace Learnable.Infrastructure.Migrations
                 name: "IX_UserOtp_Email",
                 table: "UserOtp",
                 column: "Email");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Assets_Repository_RepoId",
+                table: "Assets",
+                column: "RepoId",
+                principalTable: "Repository",
+                principalColumn: "RepoId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "ApiException");
+            migrationBuilder.DropForeignKey(
+                name: "FK_Assets_Repository_RepoId",
+                table: "Assets");
 
             migrationBuilder.DropTable(
-                name: "Assets");
+                name: "ApiException");
 
             migrationBuilder.DropTable(
                 name: "AuditLog");
@@ -424,6 +473,9 @@ namespace Learnable.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Marks");
+
+            migrationBuilder.DropTable(
+                name: "Ocr_Skans");
 
             migrationBuilder.DropTable(
                 name: "Prompt");
@@ -445,6 +497,9 @@ namespace Learnable.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Repository");
+
+            migrationBuilder.DropTable(
+                name: "Assets");
 
             migrationBuilder.DropTable(
                 name: "Class");

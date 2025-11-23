@@ -12,7 +12,8 @@ namespace Learnable.Infrastructure.Persistence.Data
     {
         public static async Task SeedUser(ApplicationDbContext context, IUnitOfWork unitOfWork, IPasswordService password)
         {
-            if (await context.Users.AnyAsync()) return;
+
+            if (await context.Users.AnyAsync()!) return;
 
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Persistence", "Data", "UserSeedData.json");
 

@@ -16,10 +16,11 @@ namespace Learnable.Infrastructure.Implementations.Services.External
         private readonly string ai_studio = "AIzaSyBLVFkkNtyFN253AJHmwHaT4Dp3s0LQ0hY";
         private readonly string google_cloud = "AIzaSyATEmVTy9AekgAdbNAIu_c5KR13QFlbxzM";
         private readonly string ai_studio_2 = "AIzaSyBRKn8-cWzVZamJJXB0WZ52yw1XCq7bSeA";
+        private readonly string ai_studio_pro_version = "AIzaSyCVe7a6MqA2Ke9IvTCUlT4Nhw8KKStRwN8";
 
         // Gemini Flash model endpoint
         private readonly string _apiUrl =
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";  
 
         public AiApiService()
         {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.InteropServices.Marshalling;
 using Microsoft.EntityFrameworkCore;
 
 namespace Learnable.Domain.Entities;
@@ -32,5 +33,10 @@ public partial class Asset
 
     [ForeignKey("RepoId")]
     [InverseProperty("Assets")]
+
+
+    // Navigation
     public virtual Repository? Repo { get; set; }
+    public virtual ICollection<Repository> Repo_List { get; set; } = new List<Repository>();
+    public virtual ICollection<Ocr_Skan> OcrScans { get; set; } = new List<Ocr_Skan>();
 }

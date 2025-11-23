@@ -35,6 +35,7 @@ namespace Learnable.Infrastructure.Persistence.Data
         public virtual DbSet<UserOtp> UserOtps { get; set; }
         public virtual DbSet<SmtpSetting> SmtpSettings { get; set; }
         public virtual DbSet<ApiException> ApiExceptions { get; set; }
+        public virtual DbSet<Ocr_Skan> Ocr_Skans { get; set; }
 
         // ============================================================
         //                       Database Config
@@ -230,6 +231,25 @@ namespace Learnable.Infrastructure.Persistence.Data
                 entity.Property(e => e.Details)
                       .HasMaxLength(2000);
             });
+
+            // -------------------- Ocr_Skan --------------------
+            modelBuilder.Entity<Ocr_Skan>(entity =>
+            {
+                // Primary Key
+                entity.HasKey(e => e.Id);
+
+                // Manual ID (not auto-generated)
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                // Relationship: Ocr_Skan (many) → Asset (one)
+                entity.HasOne(d => d.Asset)
+                      .WithMany()   // If Asset has no collection navigation
+                      .HasForeignKey(d => d.AssetId)
+                      .HasPrincipalKey(p => p.AssetsProfileId)   // FK maps to AssetsProfileId
+                      .OnDelete(DeleteBehavior.Cascade);          // Optional
+            });
+
+
 
             OnModelCreatingPartial(modelBuilder);
         }

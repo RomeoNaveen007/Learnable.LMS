@@ -11,7 +11,7 @@ namespace Learnable.Domain.Entities;
 public partial class Teacher
 {
     [Key]
-    public Guid ProfileId { get; set; }  // teacherid
+    public Guid ProfileId { get; set; }  // teacherid_forom_user_table 
 
     public Guid? UserId { get; set; }
 
@@ -27,6 +27,9 @@ public partial class Teacher
 
     [Column(TypeName = "datetime")]
     public DateTime? LastUpdatedAt { get; set; }
+
+
+
 
     [InverseProperty("Teacher")]
     public virtual ICollection<Class> Classes { get; set; } = new List<Class>();
