@@ -14,11 +14,24 @@ namespace Learnable.Infrastructure.Implementations.Repositories
         {
             _context = context;
         }
-
-        public async Task<Class?> GetByJoinNameAsync(string joinName)
+        public async Task<Class?> GetClassWithIncludesAsync(Guid classId, CancellationToken cancellationToken)
         {
             return await _context.Classes
-                .FirstOrDefaultAsync(x => x.ClassJoinName == joinName);
+                .Include(x => x.Teacher)
+                .Include(x => x.ClassStudents)
+                    .ThenInclude(cs => cs.Student)
+                .Include(x => x.Repositories)
+                .FirstOrDefaultAsync(x => x.ClassId == classId, cancellationToken);
+        }
+
+        public async Task<IEnumerable<Class>> GetAllClassesWithIncludesAsync(CancellationToken cancellationToken)
+        {
+            return await _context.Classes
+                .Include(x => x.Teacher)
+                .Include(x => x.ClassStudents)
+                    .ThenInclude(cs => cs.Student)
+                .Include(x => x.Repositories)
+                .ToListAsync(cancellationToken);
         }
     }
 }

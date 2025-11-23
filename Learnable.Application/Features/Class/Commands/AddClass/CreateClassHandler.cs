@@ -15,10 +15,12 @@ namespace Learnable.Application.Features.Class.Commands.AddClass
 {
     public class CreateClassHandler : IRequestHandler<CreateClassCommand, ClassDto>
     {
-        private readonly IClassRepository _classRepository;
+        private readonly IGenericRepository<Learnable.Domain.Entities.Class> _classRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public CreateClassHandler(IClassRepository classRepository , IUnitOfWork unitOfWork)
+        public CreateClassHandler(
+            IGenericRepository<Learnable.Domain.Entities.Class> classRepository,
+            IUnitOfWork unitOfWork)
         {
             _classRepository = classRepository;
             _unitOfWork = unitOfWork;

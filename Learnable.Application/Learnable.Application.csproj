@@ -17,9 +17,12 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.10" />
   </ItemGroup>
 
+<<<<<<< HEAD
   <ItemGroup>
     <Folder Include="Features\Repo\Commands\" />
     <Folder Include="Features\Repo\Queries\" />
   </ItemGroup>
 
+=======
+>>>>>>> dd836f1f5a15edc06452a7e3a66384123c19cca3
 </Project>
