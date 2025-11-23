@@ -10,6 +10,7 @@ namespace Learnable.Application.Interfaces.Repositories
 {
     public interface IClassRepository : IGenericRepository<Class>
     {
-        Task<Class?> GetByJoinNameAsync(string joinName);
+
+        Task<Class?> GetClassWithIncludesAsync(Guid classId, CancellationToken cancellationToken);
     }
 }
