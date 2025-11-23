@@ -12,33 +12,34 @@ namespace Learnable.WebApi.Controllers
     {
         private readonly IMediator _mediator = mediator;
 
-        [HttpPut("update")]  // http://localhost:5071/api/teacher/update
+        [HttpPut("update")]
         public async Task<ActionResult> UpdateTeacher(UpdateTeacherCommand command)
         {
+            // Get logged-in UserId
             var userId = User.GetUserId();
+
+            // Attach userId to command
+            command.UserId = userId;
 
             var result = await _mediator.Send(command);
 
             if (result == null)
                 return NotFound("Teacher not found");
 
-            return Ok(new
-            {
-                message = "Teacher updated successfully"
-            });
+            return Ok(new { message = "Teacher updated successfully" });
         }
 
-        [HttpDelete("{profileId:guid}")]   // http://localhost:5071/api/teacher/id
+
+        [HttpDelete("{profileId:guid}")]
         public async Task<ActionResult> DeleteTeacher(Guid profileId)
         {
-            var userId = User.GetUserId();
-
-            var result = await _mediator.Send(new DeleteTeacherCommand(userId));
+            var result = await _mediator.Send(new DeleteTeacherCommand(profileId));
 
             if (!result)
-                return NotFound("Teacher not found or you are not authorized to delete this teacher");
+                return NotFound("Teacher not found");
 
             return Ok(new { message = "Teacher deleted successfully" });
         }
+
     }
 }

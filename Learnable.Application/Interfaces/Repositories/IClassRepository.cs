@@ -8,10 +8,8 @@ using System.Threading.Tasks;
 
 namespace Learnable.Application.Interfaces.Repositories
 {
-    public interface ITeacherRepository : IGenericRepository<Teacher>
+    public interface IClassRepository : IGenericRepository<Class>
     {
-        Task<Teacher?> GetTeacherByProfileIdAsync(Guid profileId, CancellationToken cancellationToken);
-        Task<Teacher?> GetTeacherWithUserAsync(Guid userId, CancellationToken cancellationToken);
-
+        Task<Class?> GetByJoinNameAsync(string joinName);
     }
 }

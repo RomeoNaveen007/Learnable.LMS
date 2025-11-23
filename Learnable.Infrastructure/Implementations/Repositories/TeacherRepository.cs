@@ -1,4 +1,4 @@
-﻿using Learnable.Application.Interfaces.Repositories;
+﻿ using Learnable.Application.Interfaces.Repositories;
 using Learnable.Domain.Entities;
 using Learnable.Infrastructure.Implementations.Repositories.Generic;
 using Learnable.Infrastructure.Persistence.Data;
@@ -19,11 +19,18 @@ namespace Learnable.Infrastructure.Implementations.Repositories
         {
             this.context = context;
         }
-        public async Task<Teacher?> GetTeacherWithUserAsync(Guid userId, CancellationToken cancellationToken)
+        
+        public Task<Teacher?> GetTeacherWithUserAsync(Guid userId, CancellationToken token)
         {
-            return await context.Teachers
-                .Where(t => t.UserId == userId)
-                .FirstOrDefaultAsync(cancellationToken);
+            return context.Teachers
+                .Include(t => t.User)
+                .FirstOrDefaultAsync(t => t.UserId == userId, token);
+        }
+        public Task<Teacher?> GetTeacherByProfileIdAsync(Guid profileId, CancellationToken token)
+        {
+            return context.Teachers
+                .Include(t => t.User)
+                .FirstOrDefaultAsync(t => t.ProfileId == profileId, token);
         }
     }
 }
