@@ -11,7 +11,7 @@ namespace Learnable.Application.Features.Teacher.Commands.DeleteTeacher
     {
         public DeleteTeacherCommandValidator()
         {
-            RuleFor(x => x.UserId)
+            RuleFor(x => x.ProfileId)
                 .NotEmpty()
                 .WithMessage("ProfileId is required.");
         }

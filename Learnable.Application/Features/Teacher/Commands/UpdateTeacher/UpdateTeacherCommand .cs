@@ -10,6 +10,7 @@ namespace Learnable.Application.Features.Teacher.Commands.UpdateTeacher
 {
     public class UpdateTeacherCommand : IRequest<TeacherDto?>
     {
+        public Guid UserId { get; set; }
         public Guid ProfileId { get; set; }
 
         // Teacher fields
