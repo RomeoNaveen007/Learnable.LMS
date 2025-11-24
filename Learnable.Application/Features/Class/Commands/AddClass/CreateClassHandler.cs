@@ -52,3 +52,5 @@ namespace Learnable.Application.Features.Class.Commands.AddClass
 
 }
 
+//class change hjhij
+
