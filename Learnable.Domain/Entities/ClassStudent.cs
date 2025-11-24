@@ -5,8 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace Learnable.Domain.Entities;
-
-[PrimaryKey("ClassId", "StudentId")]
+[PrimaryKey("ClassId", "UserId")]
 [Table("ClassStudent")]
 public partial class ClassStudent
 {
@@ -14,7 +13,7 @@ public partial class ClassStudent
     public Guid ClassId { get; set; }
 
     [Key]
-    public Guid StudentId { get; set; }
+    public Guid UserId { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? JoinDate { get; set; }
@@ -26,7 +25,8 @@ public partial class ClassStudent
     [InverseProperty("ClassStudents")]
     public virtual Class Class { get; set; } = null!;
 
-    [ForeignKey("StudentId")]
+    [ForeignKey("UserId")]
     [InverseProperty("ClassStudents")]
-    public virtual Student Student { get; set; } = null!;
+    public virtual User User { get; set; } = null!;
 }
+

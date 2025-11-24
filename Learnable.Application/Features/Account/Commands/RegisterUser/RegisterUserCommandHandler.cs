@@ -10,23 +10,28 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-
 public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, UserDto>
 {
     private readonly IUserRepository _userRepo;
+    private readonly IClassStudentRepository _classStudentRepo;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPasswordService _passwordService;
     private readonly ITokenService _tokenService;
     private readonly IEmailService _emailService;
+    private readonly IGenericRepository<Class> _classRepo;
 
     public RegisterUserCommandHandler(
         IUserRepository userRepo,
+        IClassStudentRepository classStudentRepo,
+        IGenericRepository<Class> classRepo,
         IUnitOfWork unitOfWork,
         IPasswordService passwordService,
         ITokenService tokenService,
         IEmailService emailService)
     {
         _userRepo = userRepo ?? throw new ArgumentNullException(nameof(userRepo));
+        _classStudentRepo = classStudentRepo ?? throw new ArgumentNullException(nameof(classStudentRepo));
+        _classRepo = classRepo ?? throw new ArgumentNullException(nameof(classRepo));
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _passwordService = passwordService ?? throw new ArgumentNullException(nameof(passwordService));
         _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
@@ -37,31 +42,25 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, U
     {
         var dto = request.Dto;
 
-        // Get OTP record
+        // --- OTP validation ---
         var otpRecord = await _userRepo.GetOtpByEmailAsync(dto.Email, cancellationToken);
         if (otpRecord == null)
             throw new Exception("OTP not generated. Please request OTP first.");
 
-        // Check expiration
         if (otpRecord.ExpiresAt < DateTime.UtcNow)
             throw new Exception("OTP expired. Please request a new OTP.");
 
-        // Validate OTP
         if (otpRecord.OtpCode != request.OtpCode)
         {
             otpRecord.Attempts++;
-
             if (otpRecord.Attempts >= 3)
             {
-                // Generate new OTP
                 var newOtp = new Random().Next(1000, 9999).ToString();
                 otpRecord.OtpCode = newOtp;
                 otpRecord.Attempts = 0;
                 otpRecord.ExpiresAt = DateTime.UtcNow.AddMinutes(5);
-
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                // Email new OTP
                 await _emailService.SendAsync(dto.Email,
                     "New OTP Code (Retry)",
                     $"<h2>Your new OTP code is: <b>{newOtp}</b></h2>",
@@ -69,26 +68,20 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, U
 
                 throw new Exception("OTP incorrect 3 times. New OTP has been sent.");
             }
-
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             throw new Exception($"Incorrect OTP. Attempt {otpRecord.Attempts} of 3.");
         }
 
-        // OTP valid → delete OTP record
         await _userRepo.DeleteOtpAsync(otpRecord, cancellationToken);
 
-        // Validate email
+        // --- Validate email & username ---
         if (await _userRepo.ExistsByEmailAsync(dto.Email, cancellationToken))
             throw new Exception("Email already registered.");
-
-        // Validate username
         if (await _userRepo.ExistsByUsernameAsync(dto.Username, cancellationToken))
             throw new Exception("Username already taken.");
 
-        // Create password hash
+        // --- Create user ---
         _passwordService.CreatePasswordHash(dto.Password, out string hash, out string salt);
-
-        // Create user entity
         var user = new User
         {
             UserId = Guid.NewGuid(),
@@ -103,20 +96,45 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, U
             IsActive = true
         };
 
-        var created = await _userRepo.CreateAsync(user);
+        await _userRepo.CreateAsync(user);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        // Send welcome mail
+        // --- Auto-join General Class ---
+        var defaultClass = (await _classRepo.GetAllAsync())
+            .FirstOrDefault(c => c.ClassName == "General Class");
+
+        if (defaultClass == null)
+        {
+            defaultClass = new Class
+            {
+                ClassId = Guid.NewGuid(),
+                ClassName = "General Class",
+                CreatedAt = DateTime.UtcNow,
+                Status = "Active"
+            };
+            await _classRepo.CreateAsync(defaultClass);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+
+        if (!await _classStudentRepo.IsStudentInClassAsync(defaultClass.ClassId, user.UserId, cancellationToken))
+        {
+            await _classStudentRepo.CreateAsync(new ClassStudent
+            {
+                ClassId = defaultClass.ClassId,
+                UserId = user.UserId,
+                JoinDate = DateTime.UtcNow,
+                StudentStatus = "Active"
+            });
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+
+        // --- Send welcome mail ---
         await _emailService.SendAsync(user.Email,
             "Registration Successful",
             $"<h2>Welcome {user.Username}!</h2><p>Your account has been created successfully.</p>",
             cancellationToken);
 
-        // generate jwt
-        var token = _tokenService.CreateToken(user);
-
-        // return dto
+        // --- Return DTO ---
         return user.ToDto(_tokenService);
-            
     }
 }

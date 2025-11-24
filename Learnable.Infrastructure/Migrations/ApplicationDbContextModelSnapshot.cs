@@ -217,7 +217,7 @@ namespace Learnable.Infrastructure.Migrations
                     b.Property<Guid>("ClassId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("StudentId")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("JoinDate")
@@ -231,9 +231,9 @@ namespace Learnable.Infrastructure.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasDefaultValue("Active");
 
-                    b.HasKey("ClassId", "StudentId");
+                    b.HasKey("ClassId", "UserId");
 
-                    b.HasIndex("StudentId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("ClassStudent");
                 });
@@ -556,14 +556,14 @@ namespace Learnable.Infrastructure.Migrations
                         .HasForeignKey("ClassId")
                         .IsRequired();
 
-                    b.HasOne("Learnable.Domain.Entities.Student", "Student")
+                    b.HasOne("Learnable.Domain.Entities.User", "User")
                         .WithMany("ClassStudents")
-                        .HasForeignKey("StudentId")
+                        .HasForeignKey("UserId")
                         .IsRequired();
 
                     b.Navigation("Class");
 
-                    b.Navigation("Student");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Learnable.Domain.Entities.Exam", b =>
@@ -657,8 +657,6 @@ namespace Learnable.Infrastructure.Migrations
 
             modelBuilder.Entity("Learnable.Domain.Entities.Student", b =>
                 {
-                    b.Navigation("ClassStudents");
-
                     b.Navigation("Marks");
                 });
 
@@ -670,6 +668,8 @@ namespace Learnable.Infrastructure.Migrations
             modelBuilder.Entity("Learnable.Domain.Entities.User", b =>
                 {
                     b.Navigation("AuditLogs");
+
+                    b.Navigation("ClassStudents");
 
                     b.Navigation("RequestNotificationReceivers");
 
