@@ -12,6 +12,8 @@ namespace Learnable.Application.Common.Dtos
         public string ClassName { get; set; } = null!;
         public string ClassJoinName { get; set; } = null!;
         public string? Description { get; set; }
+        public DateTime? CreatedAt { get; set; }
+
         public Guid? TeacherId { get; set; }
         public string? Status { get; set; }
     }
