@@ -12,5 +12,7 @@ namespace Learnable.Application.Interfaces.Repositories
     {
         Task<Class?> GetClassWithIncludesAsync(Guid classId, CancellationToken cancellationToken);
         Task<IEnumerable<Class>> GetAllClassesWithIncludesAsync(CancellationToken cancellationToken);
+        Task<Class?> GetClassByJoinNameAsync(string joinName, CancellationToken cancellationToken);
+
     }
 }
