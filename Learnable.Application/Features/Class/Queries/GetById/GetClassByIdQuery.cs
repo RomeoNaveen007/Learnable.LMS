@@ -6,7 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Learnable.Application.Features.Class.Queries.GetById
+namespace Learnable.Application.Features.Class.Queries
 {
-    public record GetClassByIdQuery(Guid ClassId) : IRequest<ClassDto?>;
+    public class GetClassByIdQuery : IRequest<ClassResponseDto?>
+    {
+        public Guid ClassId { get; set; }
+    }
+
 }
