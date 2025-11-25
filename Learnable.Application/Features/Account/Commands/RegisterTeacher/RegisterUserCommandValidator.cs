@@ -19,10 +19,6 @@ namespace Learnable.Application.Features.Account.Commands.RegisterTeacher
                 .NotEmpty().WithMessage("Username is required.")
                 .MaximumLength(50).WithMessage("Username cannot exceed 50 characters.");
 
-            RuleFor(x => x.Dto.Password)
-                .NotEmpty().WithMessage("Password is required.")
-                .MinimumLength(6).WithMessage("Password must be at least 6 characters long.");
-
             RuleFor(x => x.OtpCode)
                 .NotEmpty().WithMessage("OTP code is required.")
                 .Length(4).WithMessage("OTP code must be 4 digits.");

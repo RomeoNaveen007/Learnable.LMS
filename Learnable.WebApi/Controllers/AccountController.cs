@@ -1,4 +1,5 @@
 ﻿using Learnable.Application.Common.Dtos;
+using Learnable.Application.Common.Extensions;
 using Learnable.Application.Features.Account.Commands.RegisterTeacher;
 using Learnable.Application.Features.Users.Commands.RegisterUser;
 using Learnable.Application.Features.Users.Queries.LoginUser;
@@ -50,9 +51,14 @@ namespace Learnable.WebApi.Controllers
             return Ok(result);
         }
 
-        [HttpPost("register-teacher")]  //  http://localhost:5071/api/Account/register-teacher
+        [HttpPost("register-teacher")]
         public async Task<ActionResult<TeacherUserDto>> RegisterTeacher([FromBody] RegisterTeacherCommand command)
         {
+            var loggedInUserId = User.GetUserId();
+
+            // override userId from JWT
+            command.Dto.UserId = loggedInUserId;
+
             var result = await _mediator.Send(command);
             return Ok(result);
         }
