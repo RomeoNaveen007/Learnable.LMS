@@ -1,45 +1,38 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using static Learnable.Application.Features.Asset.Commands.AddAsset.AddAssetCommand;
 
 namespace Learnable.Infrastructure.Implementations.Services.External
 {
+    // Service class (no IActionResult here)
     public class AiApiService
     {
-        // HttpClient used for calling external APIs
         private readonly HttpClient _httpClient;
-
-        // Google Gemini API key
-        private readonly string _apiKey = "AIzaSyATEmVTy9AekgAdbNAIu_c5KR13QFlbxzM";
-        private readonly string ai_studio = "AIzaSyBLVFkkNtyFN253AJHmwHaT4Dp3s0LQ0hY";
+        private readonly string _apiKey = "AIzaSyBRKn8-cWzVZamJJXB0WZ52yw1XCq7bSeA";
         private readonly string google_cloud = "AIzaSyATEmVTy9AekgAdbNAIu_c5KR13QFlbxzM";
-        private readonly string ai_studio_2 = "AIzaSyBRKn8-cWzVZamJJXB0WZ52yw1XCq7bSeA";
 
-        // Gemini Flash model endpoint
-        private readonly string _apiUrl =
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+        private readonly string _apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
         public AiApiService()
         {
-            // Initialize HttpClient
             _httpClient = new HttpClient();
         }
 
-        /// <summary>
-        /// Sends a prompt to Gemini AI and returns the response
-        /// as a List<string> (each part returned as separate item).
-        /// </summary>
-        /// <param name="prompt">User text input</param>
-        /// <returns>AI output as List<string></returns>
-        public async Task<List<string>> AskAi(string prompt)
+        public async Task<List<OcrPdfDto>> AskAiAsync(List<OcrPdfDto> chunks)
         {
-            // Validate prompt
-            if (string.IsNullOrWhiteSpace(prompt))
-                return new List<string> { "Prompt cannot be empty." };
+            if (chunks == null || chunks.Count == 0)
+                throw new ArgumentException("Chunk list cannot be empty.");
 
-            // Prepare request body structure required by Gemini API
+            string prompt = "<task><description>You will receive text data in small chunk from a PDF OCR scan. Some letters may be missing and some words may have incorrect meanings. Correct each chunk and turn them into neat verses. Data is provided as a list of objects: { \"chunkIndex\": int, \"chunkText\": string } Return the response in the string list format,Use $ to highlight each meaningful verse. Place $ at the beginning and end of the verse., with each object containing the corrected  text. Maintain the order of chunks. Each verse must remain in its own chunk.</description></task>";
+
+            foreach (var c in chunks)
+                prompt += $"Chunk {c.ChunkId}: {c.Chunk}\n";
+
             var requestBody = new
             {
                 contents = new[]
@@ -47,59 +40,52 @@ namespace Learnable.Infrastructure.Implementations.Services.External
                     new {
                         parts = new[]
                         {
-                            new { text = prompt } // user prompt
+                            new { text = prompt }
                         }
                     }
                 }
             };
 
-            // Convert object to JSON string
             var json = JsonSerializer.Serialize(requestBody);
-
-            // Wrap JSON as HTTP request content
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            try
+            var response = await _httpClient.PostAsync($"{_apiUrl}?key={_apiKey}", content);
+            var result = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                throw new HttpRequestException($"AI API error: {result}");
+
+            using var doc = JsonDocument.Parse(result);
+            var text = doc.RootElement
+                          .GetProperty("candidates")[0]
+                          .GetProperty("content")
+                          .GetProperty("parts")[0]
+                          .GetProperty("text")
+                          .GetString();
+            List<OcrPdfDto> gg = new List<OcrPdfDto>();
+            string[] dd = text.Split('$');
+
+            foreach (var c in dd)
             {
-                // Send POST request to Gemini API
-                var response = await _httpClient.PostAsync($"{_apiUrl}?key={_apiKey}", content);
+                OcrPdfDto hhh = new OcrPdfDto();
+                hhh.Chunk = $"{c}";
+                gg.Add(hhh);
 
-                // Read the response body
-                var result = await response.Content.ReadAsStringAsync();
-
-                // If API returned an error, return the raw error as list item
-                if (!response.IsSuccessStatusCode)
-                    return new List<string> { result };
-
-                // Parse the JSON response
-                using var doc = JsonDocument.Parse(result);
-
-                // Extract "parts" array containing text output
-                var parts = doc.RootElement
-                               .GetProperty("candidates")[0]
-                               .GetProperty("content")
-                               .GetProperty("parts");
-
-                // List to store the final AI output lines
-                List<string> outputList = new List<string>();
-
-                // Loop through each part and extract text
-                foreach (var part in parts.EnumerateArray())
+            }
+            for (int i = gg.Count - 1; i >= 0; i--)
+            {
+                if (i % 2 == 0)
                 {
-                    var text = part.GetProperty("text").GetString();
-
-                    if (!string.IsNullOrWhiteSpace(text))
-                        outputList.Add(text); // add each output string to list
+                    gg.RemoveAt(i);
                 }
 
-                // Return the list of AI outputs
-                return outputList;
             }
-            catch (Exception ex)
-            {
-                // Return error details as a list
-                return new List<string> { "Error occurred", ex.Message };
-            }
+            return gg;
         }
     }
+
+   
+
+    
+    
 }
