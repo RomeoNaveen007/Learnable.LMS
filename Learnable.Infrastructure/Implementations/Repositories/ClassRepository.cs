@@ -17,19 +17,23 @@ namespace Learnable.Infrastructure.Implementations.Repositories
         public async Task<Class?> GetClassWithIncludesAsync(Guid classId, CancellationToken cancellationToken)
         {
             return await _context.Classes
-                .Include(x => x.Teacher)
-                .Include(x => x.ClassStudents)
-                    .ThenInclude(cs => cs.Student)
-                .Include(x => x.Repositories)
-                .FirstOrDefaultAsync(x => x.ClassId == classId, cancellationToken);
+                .Include(c => c.Teacher)
+                    .ThenInclude(t => t.User)
+                .Include(c => c.ClassStudents)
+                    .ThenInclude(cs => cs.User)
+                //.ThenInclude(s => s.User)  
+                .Include(c => c.Repositories)
+                .FirstOrDefaultAsync(c => c.ClassId == classId, cancellationToken);
         }
 
+
+     
         public async Task<IEnumerable<Class>> GetAllClassesWithIncludesAsync(CancellationToken cancellationToken)
         {
             return await _context.Classes
                 .Include(x => x.Teacher)
                 .Include(x => x.ClassStudents)
-                    .ThenInclude(cs => cs.Student)
+                    .ThenInclude(cs => cs.User)
                 .Include(x => x.Repositories)
                 .ToListAsync(cancellationToken);
         }

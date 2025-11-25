@@ -19,9 +19,6 @@ public partial class Student
     public DateTime? EnrollmentDate { get; set; }
 
     [InverseProperty("Student")]
-    public virtual ICollection<ClassStudent> ClassStudents { get; set; } = new List<ClassStudent>();
-
-    [InverseProperty("Student")]
     public virtual ICollection<Mark> Marks { get; set; } = new List<Mark>();
 
     [ForeignKey("UserId")]
