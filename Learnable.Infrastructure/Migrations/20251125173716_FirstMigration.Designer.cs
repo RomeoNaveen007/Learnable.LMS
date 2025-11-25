@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Learnable.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251125170804_FirstMigration")]
+    [Migration("20251125173716_FirstMigration")]
     partial class FirstMigration
     {
         /// <inheritdoc />
@@ -298,6 +298,7 @@ namespace Learnable.Infrastructure.Migrations
             modelBuilder.Entity("Learnable.Domain.Entities.OcrPdf", b =>
                 {
                     b.Property<Guid>("OcrPdfId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("AssetId")
@@ -314,7 +315,7 @@ namespace Learnable.Infrastructure.Migrations
 
                     b.HasIndex("AssetId");
 
-                    b.ToTable("OcrPdfs");
+                    b.ToTable("OcrPdf");
                 });
 
             modelBuilder.Entity("Learnable.Domain.Entities.Prompt", b =>
@@ -646,15 +647,18 @@ namespace Learnable.Infrastructure.Migrations
                 {
                     b.HasOne("Learnable.Domain.Entities.Class", "Class")
                         .WithMany("RequestNotifications")
-                        .HasForeignKey("ClassId");
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Learnable.Domain.Entities.User", "Receiver")
                         .WithMany("RequestNotificationReceivers")
-                        .HasForeignKey("ReceiverId");
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Learnable.Domain.Entities.User", "Sender")
                         .WithMany("RequestNotificationSenders")
-                        .HasForeignKey("SenderId");
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Class");
 

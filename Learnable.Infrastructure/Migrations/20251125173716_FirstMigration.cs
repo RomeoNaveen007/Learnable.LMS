@@ -243,17 +243,20 @@ namespace Learnable.Infrastructure.Migrations
                         name: "FK_RequestNotification_Class_ClassId",
                         column: x => x.ClassId,
                         principalTable: "Class",
-                        principalColumn: "ClassId");
+                        principalColumn: "ClassId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_RequestNotification_User_ReceiverId",
                         column: x => x.ReceiverId,
                         principalTable: "User",
-                        principalColumn: "UserId");
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_RequestNotification_User_SenderId",
                         column: x => x.SenderId,
                         principalTable: "User",
-                        principalColumn: "UserId");
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -302,7 +305,7 @@ namespace Learnable.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OcrPdfs",
+                name: "OcrPdf",
                 columns: table => new
                 {
                     OcrPdfId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -312,9 +315,9 @@ namespace Learnable.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OcrPdfs", x => x.OcrPdfId);
+                    table.PrimaryKey("PK_OcrPdf", x => x.OcrPdfId);
                     table.ForeignKey(
-                        name: "FK_OcrPdfs_Assets_AssetId",
+                        name: "FK_OcrPdf_Assets_AssetId",
                         column: x => x.AssetId,
                         principalTable: "Assets",
                         principalColumn: "AssetsProfileId",
@@ -387,8 +390,8 @@ namespace Learnable.Infrastructure.Migrations
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OcrPdfs_AssetId",
-                table: "OcrPdfs",
+                name: "IX_OcrPdf_AssetId",
+                table: "OcrPdf",
                 column: "AssetId");
 
             migrationBuilder.CreateIndex(
@@ -459,7 +462,7 @@ namespace Learnable.Infrastructure.Migrations
                 name: "Marks");
 
             migrationBuilder.DropTable(
-                name: "OcrPdfs");
+                name: "OcrPdf");
 
             migrationBuilder.DropTable(
                 name: "Prompt");
