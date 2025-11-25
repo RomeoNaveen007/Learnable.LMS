@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Learnable.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class First : Migration
+    public partial class FirstMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -89,31 +89,6 @@ namespace Learnable.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_UserOtp", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RequestNotification",
-                columns: table => new
-                {
-                    NotificationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SenderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ReceiverId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    NotificationStatus = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true, defaultValue: "Sent"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "(getdate())")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RequestNotification", x => x.NotificationId);
-                    table.ForeignKey(
-                        name: "FK_RequestNotification_User_ReceiverId",
-                        column: x => x.ReceiverId,
-                        principalTable: "User",
-                        principalColumn: "UserId");
-                    table.ForeignKey(
-                        name: "FK_RequestNotification_User_SenderId",
-                        column: x => x.SenderId,
-                        principalTable: "User",
-                        principalColumn: "UserId");
                 });
 
             migrationBuilder.CreateTable(
@@ -251,6 +226,37 @@ namespace Learnable.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RequestNotification",
+                columns: table => new
+                {
+                    NotificationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SenderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ReceiverId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ClassId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    NotificationStatus = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true, defaultValue: "Sent"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "(getdate())")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RequestNotification", x => x.NotificationId);
+                    table.ForeignKey(
+                        name: "FK_RequestNotification_Class_ClassId",
+                        column: x => x.ClassId,
+                        principalTable: "Class",
+                        principalColumn: "ClassId");
+                    table.ForeignKey(
+                        name: "FK_RequestNotification_User_ReceiverId",
+                        column: x => x.ReceiverId,
+                        principalTable: "User",
+                        principalColumn: "UserId");
+                    table.ForeignKey(
+                        name: "FK_RequestNotification_User_SenderId",
+                        column: x => x.SenderId,
+                        principalTable: "User",
+                        principalColumn: "UserId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Assets",
                 columns: table => new
                 {
@@ -293,6 +299,26 @@ namespace Learnable.Infrastructure.Migrations
                         column: x => x.RepoId,
                         principalTable: "Repository",
                         principalColumn: "RepoId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OcrPdfs",
+                columns: table => new
+                {
+                    OcrPdfId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ChunkId = table.Column<int>(type: "int", nullable: false),
+                    Chunk = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AssetId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OcrPdfs", x => x.OcrPdfId);
+                    table.ForeignKey(
+                        name: "FK_OcrPdfs_Assets_AssetId",
+                        column: x => x.AssetId,
+                        principalTable: "Assets",
+                        principalColumn: "AssetsProfileId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -361,8 +387,18 @@ namespace Learnable.Infrastructure.Migrations
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_OcrPdfs_AssetId",
+                table: "OcrPdfs",
+                column: "AssetId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Repository_ClassId",
                 table: "Repository",
+                column: "ClassId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RequestNotification_ClassId",
+                table: "RequestNotification",
                 column: "ClassId");
 
             migrationBuilder.CreateIndex(
@@ -414,9 +450,6 @@ namespace Learnable.Infrastructure.Migrations
                 name: "ApiException");
 
             migrationBuilder.DropTable(
-                name: "Assets");
-
-            migrationBuilder.DropTable(
                 name: "AuditLog");
 
             migrationBuilder.DropTable(
@@ -424,6 +457,9 @@ namespace Learnable.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Marks");
+
+            migrationBuilder.DropTable(
+                name: "OcrPdfs");
 
             migrationBuilder.DropTable(
                 name: "Prompt");
@@ -442,6 +478,9 @@ namespace Learnable.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Student");
+
+            migrationBuilder.DropTable(
+                name: "Assets");
 
             migrationBuilder.DropTable(
                 name: "Repository");

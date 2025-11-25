@@ -292,6 +292,28 @@ namespace Learnable.Infrastructure.Migrations
                     b.ToTable("Marks");
                 });
 
+            modelBuilder.Entity("Learnable.Domain.Entities.OcrPdf", b =>
+                {
+                    b.Property<Guid>("OcrPdfId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AssetId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Chunk")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ChunkId")
+                        .HasColumnType("int");
+
+                    b.HasKey("OcrPdfId");
+
+                    b.HasIndex("AssetId");
+
+                    b.ToTable("OcrPdfs");
+                });
+
             modelBuilder.Entity("Learnable.Domain.Entities.Prompt", b =>
                 {
                     b.Property<Guid>("Id")
@@ -352,6 +374,9 @@ namespace Learnable.Infrastructure.Migrations
                     b.Property<Guid>("NotificationId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("ClassId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime?>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
@@ -370,6 +395,8 @@ namespace Learnable.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("NotificationId");
+
+                    b.HasIndex("ClassId");
 
                     b.HasIndex("ReceiverId");
 
@@ -592,6 +619,17 @@ namespace Learnable.Infrastructure.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("Learnable.Domain.Entities.OcrPdf", b =>
+                {
+                    b.HasOne("Learnable.Domain.Entities.Asset", "Asset")
+                        .WithMany("OcrPdfs")
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Asset");
+                });
+
             modelBuilder.Entity("Learnable.Domain.Entities.Repository", b =>
                 {
                     b.HasOne("Learnable.Domain.Entities.Class", "Class")
@@ -603,6 +641,10 @@ namespace Learnable.Infrastructure.Migrations
 
             modelBuilder.Entity("Learnable.Domain.Entities.RequestNotification", b =>
                 {
+                    b.HasOne("Learnable.Domain.Entities.Class", "Class")
+                        .WithMany("RequestNotifications")
+                        .HasForeignKey("ClassId");
+
                     b.HasOne("Learnable.Domain.Entities.User", "Receiver")
                         .WithMany("RequestNotificationReceivers")
                         .HasForeignKey("ReceiverId");
@@ -610,6 +652,8 @@ namespace Learnable.Infrastructure.Migrations
                     b.HasOne("Learnable.Domain.Entities.User", "Sender")
                         .WithMany("RequestNotificationSenders")
                         .HasForeignKey("SenderId");
+
+                    b.Navigation("Class");
 
                     b.Navigation("Receiver");
 
@@ -634,6 +678,11 @@ namespace Learnable.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Learnable.Domain.Entities.Asset", b =>
+                {
+                    b.Navigation("OcrPdfs");
+                });
+
             modelBuilder.Entity("Learnable.Domain.Entities.Class", b =>
                 {
                     b.Navigation("AuditLogs");
@@ -641,6 +690,8 @@ namespace Learnable.Infrastructure.Migrations
                     b.Navigation("ClassStudents");
 
                     b.Navigation("Repositories");
+
+                    b.Navigation("RequestNotifications");
                 });
 
             modelBuilder.Entity("Learnable.Domain.Entities.Exam", b =>
