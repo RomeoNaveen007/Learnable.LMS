@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Learnable.Application.Features.Class.Queries.GetAll
 {
+
     public class GetAllClassesQueryHandler : IRequestHandler<GetAllClassesQuery, IEnumerable<ClassDto>>
     {
         private readonly IClassRepository _classRepository;
@@ -34,3 +35,6 @@ namespace Learnable.Application.Features.Class.Queries.GetAll
         }
     }
 }
+
+
+

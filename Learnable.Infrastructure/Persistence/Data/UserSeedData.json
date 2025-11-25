@@ -5,12 +5,12 @@
     "Username": "admin@learnable.com",
     "DisplayName": "Admin",
     "FullName": "System Administrator",
-    "Role": "Admin",
+    "Role": "Student",
     "Token": ""
   },
   {
     "UserId": "a1f23db6-45e1-4c5f-9fa2-c5b5f8e6ab77",
-    "Email": "sureshkirusthiya@gmail.com",
+    "Email": "Suresh@gmail.com",
     "Username": "Diya",
     "DisplayName": "Kirusthiya Suresh",
     "FullName": "Kirusthiya Suresh",
@@ -23,7 +23,7 @@
     "Username": "lecturer1@learnable.com",
     "DisplayName": "Lecturer One",
     "FullName": "Dr. Priya Raman",
-    "Role": "Lecturer",
+    "Role": "Student",
     "Token": ""
   },
   {
@@ -32,7 +32,7 @@
     "Username": "staff1@learnable.com",
     "DisplayName": "Staff One",
     "FullName": "Anjali Devi",
-    "Role": "Staff",
+    "Role": "Student",
     "Token": ""
   },
   {

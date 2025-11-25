@@ -209,23 +209,23 @@ namespace Learnable.Infrastructure.Migrations
                 columns: table => new
                 {
                     ClassId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StudentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     JoinDate = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "(getdate())"),
                     StudentStatus = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true, defaultValue: "Active")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ClassStudent", x => new { x.ClassId, x.StudentId });
+                    table.PrimaryKey("PK_ClassStudent", x => new { x.ClassId, x.UserId });
                     table.ForeignKey(
                         name: "FK_ClassStudent_Class_ClassId",
                         column: x => x.ClassId,
                         principalTable: "Class",
                         principalColumn: "ClassId");
                     table.ForeignKey(
-                        name: "FK_ClassStudent_Student_StudentId",
-                        column: x => x.StudentId,
-                        principalTable: "Student",
-                        principalColumn: "StudentId");
+                        name: "FK_ClassStudent_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "UserId");
                 });
 
             migrationBuilder.CreateTable(
@@ -346,9 +346,9 @@ namespace Learnable.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ClassStudent_StudentId",
+                name: "IX_ClassStudent_UserId",
                 table: "ClassStudent",
-                column: "StudentId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Exam_RepoId",
