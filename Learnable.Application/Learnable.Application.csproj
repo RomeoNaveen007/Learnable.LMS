@@ -17,4 +17,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.10" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\Asset\Queries\" />
+  </ItemGroup>
+
 </Project>
