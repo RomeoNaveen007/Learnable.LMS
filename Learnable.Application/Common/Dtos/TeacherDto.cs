@@ -21,6 +21,10 @@ namespace Learnable.Application.Common.Dtos
         public string? FullName { get; set; }
         public string? Username { get; set; }
         public string Email { get; set; } = null!;
+
+        // Classes
+        public List<ClassDto> Classes { get; set; } = new();
+
     }
 
     // Combined DTO for returning both User + Teacher

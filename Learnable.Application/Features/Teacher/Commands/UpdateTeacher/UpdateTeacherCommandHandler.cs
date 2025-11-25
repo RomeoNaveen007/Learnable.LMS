@@ -28,7 +28,7 @@ namespace Learnable.Application.Features.Teacher.Commands.UpdateTeacher
         {
             // Fetch Teacher + related User
             var teacher = await _teacherRepository
-                .GetTeacherWithUserAsync(request.ProfileId, cancellationToken);
+                .GetTeacherWithUserAndClassesAsync(request.ProfileId, cancellationToken);
 
             if (teacher == null)
                 return null;

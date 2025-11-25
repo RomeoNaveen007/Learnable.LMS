@@ -2,6 +2,7 @@
 using Learnable.Domain.Entities;
 using Learnable.Infrastructure.Implementations.Repositories.Generic;
 using Learnable.Infrastructure.Persistence.Data;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -19,18 +20,28 @@ namespace Learnable.Infrastructure.Implementations.Repositories
         {
             this.context = context;
         }
-        
-        public Task<Teacher?> GetTeacherWithUserAsync(Guid userId, CancellationToken token)
+
+        public async Task<Teacher?> GetTeacherWithUserAndClassesAsync(Guid profileId, CancellationToken cancellationToken)
         {
-            return context.Teachers
+            return await context.Teachers
                 .Include(t => t.User)
-                .FirstOrDefaultAsync(t => t.UserId == userId, token);
+                .Include(t => t.Classes)
+                .FirstOrDefaultAsync(t => t.ProfileId == profileId);
         }
-        public Task<Teacher?> GetTeacherByProfileIdAsync(Guid profileId, CancellationToken token)
+
+        public async Task<List<Teacher>> GetAllTeachersWithUserAndClassesAsync()
         {
-            return context.Teachers
+            return await context.Teachers
                 .Include(t => t.User)
-                .FirstOrDefaultAsync(t => t.ProfileId == profileId, token);
+                .Include(t => t.Classes)
+                .ToListAsync();
         }
+
+        public async Task<Teacher?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken)
+        {
+            return await context.Teachers
+                .FirstOrDefaultAsync(t => t.UserId == userId, cancellationToken);
+        }
+
     }
 }

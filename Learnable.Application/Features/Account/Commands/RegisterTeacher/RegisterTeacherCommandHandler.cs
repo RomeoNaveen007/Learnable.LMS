@@ -13,102 +13,66 @@ using System.Threading.Tasks;
 
 namespace Learnable.Application.Features.Account.Commands.RegisterTeacher
 {
-    public class RegisterTeacherCommandHandler : IRequestHandler<RegisterTeacherCommand, TeacherUserDto>
+    public class RegisterTeacherCommandHandler
+        : IRequestHandler<RegisterTeacherCommand, TeacherUserDto>
     {
         private readonly IUserRepository _userRepo;
         private readonly ITeacherRepository _teacherRepo;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IPasswordService _passwordService;
         private readonly ITokenService _tokenService;
-        private readonly IEmailService _emailService;
 
         public RegisterTeacherCommandHandler(
             IUserRepository userRepo,
             ITeacherRepository teacherRepo,
             IUnitOfWork unitOfWork,
-            IPasswordService passwordService,
-            ITokenService tokenService,
-            IEmailService emailService)
+            ITokenService tokenService)
         {
-            _userRepo = userRepo ?? throw new ArgumentNullException(nameof(userRepo));
-            _teacherRepo = teacherRepo ?? throw new ArgumentNullException(nameof(teacherRepo));
-            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-            _passwordService = passwordService ?? throw new ArgumentNullException(nameof(passwordService));
-            _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
-            _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
+            _userRepo = userRepo;
+            _teacherRepo = teacherRepo;
+            _unitOfWork = unitOfWork;
+            _tokenService = tokenService;
         }
 
-        public async Task<TeacherUserDto> Handle(RegisterTeacherCommand request, CancellationToken cancellationToken)
+        public async Task<TeacherUserDto> Handle(
+            RegisterTeacherCommand request,
+            CancellationToken cancellationToken)
         {
             var dto = request.Dto;
 
-            // 🔹 OTP validation
-            var otpRecord = await _userRepo.GetOtpByEmailAsync(dto.Email, cancellationToken);
-            if (otpRecord == null)
-                throw new Exception("OTP not generated. Please request OTP first.");
+            // 1. Check OTP
+            var otp = await _userRepo.GetOtpByEmailAsync(dto.Email, cancellationToken);
+            if (otp == null)
+                throw new Exception("OTP not found. Request a new OTP.");
 
-            if (otpRecord.ExpiresAt < DateTime.UtcNow)
-                throw new Exception("OTP expired. Please request a new OTP.");
+            if (otp.ExpiresAt < DateTime.UtcNow)
+                throw new Exception("OTP expired.");
 
-            if (otpRecord.OtpCode != request.OtpCode)
-            {
-                otpRecord.Attempts++;
-                if (otpRecord.Attempts >= 3)
-                {
-                    var newOtp = new Random().Next(1000, 9999).ToString();
-                    otpRecord.OtpCode = newOtp;
-                    otpRecord.Attempts = 0;
-                    otpRecord.ExpiresAt = DateTime.UtcNow.AddMinutes(5);
+            if (otp.OtpCode != request.OtpCode)
+                throw new Exception("Invalid OTP.");
 
-                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _userRepo.DeleteOtpAsync(otp, cancellationToken);
 
-                    await _emailService.SendAsync(dto.Email,
-                        "New OTP Code (Retry)",
-                        $"<h2>Your new OTP code is: <b>{newOtp}</b></h2>",
-                        cancellationToken);
+            // 2. Load existing user
+            var user = await _userRepo.GetUserByIdAsync(dto.UserId, cancellationToken);
+            if (user == null)
+                throw new Exception("User does not exist.");
 
-                    throw new Exception("OTP incorrect 3 times. New OTP has been sent.");
-                }
+            // 3. Check if teacher already exists
+            var existingTeacher = await _teacherRepo.GetByUserIdAsync(dto.UserId, cancellationToken);
+            if (existingTeacher != null)
+                throw new Exception("Teacher profile already exists.");
 
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-                throw new Exception($"Incorrect OTP. Attempt {otpRecord.Attempts} of 3.");
-            }
+            // 4. Convert user into teacher
+            user.Role = "Teacher";
+            user.FullName = dto.FullName ?? user.FullName;
+            user.DisplayName = dto.DisplayName ?? user.DisplayName;
+            await _userRepo.UpdateAsync(user);
 
-            // OTP valid → delete OTP record
-            await _userRepo.DeleteOtpAsync(otpRecord, cancellationToken);
-
-            // 🔹 Validate email & username
-            if (await _userRepo.ExistsByEmailAsync(dto.Email, cancellationToken))
-                throw new Exception("Email already registered.");
-
-            if (await _userRepo.ExistsByUsernameAsync(dto.Username, cancellationToken))
-                throw new Exception("Username already taken.");
-
-            // 🔹 Create password hash
-            _passwordService.CreatePasswordHash(dto.Password, out string hash, out string salt);
-
-            // 🔹 Create User entity with Teacher role
-            var user = new Learnable.Domain.Entities.User
-            {
-                UserId = Guid.NewGuid(),
-                Email = dto.Email,
-                Username = dto.Username,
-                DisplayName = dto.DisplayName,
-                FullName = dto.FullName,
-                PasswordHash = hash,
-                PasswordSalt = salt,
-                Role = "Teacher",
-                CreatedAt = DateTime.UtcNow,
-                IsActive = true
-            };
-
-            await _userRepo.CreateAsync(user);
-
-            // 🔹 Create linked Teacher entity
+            // 5. Create Teacher record
             var teacher = new Learnable.Domain.Entities.Teacher
             {
                 ProfileId = Guid.NewGuid(),
-                UserId = user.UserId,
+                UserId = dto.UserId,
                 DateOfBirth = dto.DateOfBirth,
                 ContactPhone = dto.ContactPhone,
                 Bio = dto.Bio,
@@ -118,14 +82,7 @@ namespace Learnable.Application.Features.Account.Commands.RegisterTeacher
 
             await _teacherRepo.CreateAsync(teacher);
 
-            // 🔹 Save both User + Teacher
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-            // 🔹 Send welcome mail
-            await _emailService.SendAsync(user.Email,
-                "Teacher Registration Successful",
-                $"<h2>Welcome {user.Username}!</h2><p>Your teacher account has been created successfully.</p>",
-                cancellationToken);
 
             return new TeacherUserDto
             {

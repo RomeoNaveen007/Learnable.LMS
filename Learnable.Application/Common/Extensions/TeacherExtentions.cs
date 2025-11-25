@@ -26,8 +26,24 @@ namespace Learnable.Application.Common.Extensions
                 DisplayName = teacher.User?.DisplayName,
                 FullName = teacher.User?.FullName,
                 Username = teacher.User?.Username,
-                Email = teacher.User?.Email ?? string.Empty
+                Email = teacher.User?.Email ?? string.Empty,
+
+                // Classes
+                Classes = teacher.Classes.Select(c => new ClassDto
+                {
+                    ClassId = c.ClassId,
+                    ClassName = c.ClassName,
+                    ClassJoinName = c.ClassJoinName,
+                    Description = c.Description,
+                    CreatedAt = c.CreatedAt,
+                    Status = c.Status
+                }).ToList()
             };
+        }
+
+        public static List<TeacherDto> ToDtoList(this IEnumerable<Teacher> teachers)
+        {
+            return teachers.Select(t => t.ToDto()).ToList();
         }
     }
 }
