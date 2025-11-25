@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Learnable.Application.Interfaces.Services.External;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -10,7 +11,7 @@ using static Learnable.Application.Features.Asset.Commands.AddAsset.AddAssetComm
 namespace Learnable.Infrastructure.Implementations.Services.External
 {
     // Service class (no IActionResult here)
-    public class AiApiService
+    public class AiApiService: IAiApiService
     {
         private readonly HttpClient _httpClient;
         private readonly string _apiKey = "AIzaSyBRKn8-cWzVZamJJXB0WZ52yw1XCq7bSeA";
@@ -78,6 +79,7 @@ namespace Learnable.Infrastructure.Implementations.Services.External
                 {
                     gg.RemoveAt(i);
                 }
+
 
             }
             return gg;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Learnable.Application.Interfaces.Services.External
 {
-    internal interface IAiApiService
+    public interface IAiApiService
     {
     }
 }

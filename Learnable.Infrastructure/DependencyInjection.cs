@@ -5,9 +5,11 @@ using Learnable.Application.Features.Users.Queries.LoginUser;
 using Learnable.Application.Interfaces.Repositories;
 using Learnable.Application.Interfaces.Repositories.Generic;
 using Learnable.Application.Interfaces.Services;
+using Learnable.Application.Interfaces.Services.External;
 using Learnable.Domain.Common.Email;
 using Learnable.Infrastructure.Implementations.Repositories;
 using Learnable.Infrastructure.Implementations.Repositories.Generic;
+using Learnable.Infrastructure.Implementations.Services.External;
 using Learnable.Infrastructure.Implementations.Services.Internal;
 using Learnable.Infrastructure.Persistence.Data;
 using MediatR;
@@ -37,6 +39,9 @@ namespace Learnable.Infrastructure
             // Token & Password Services
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IPasswordService, PasswordService>();
+
+            //apiservices
+            services.AddScoped<IAiApiService, AiApiService>();
 
             // Generic repository
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
