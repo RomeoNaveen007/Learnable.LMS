@@ -37,5 +37,17 @@ namespace Learnable.Infrastructure.Implementations.Repositories
                 .Include(x => x.Repositories)
                 .ToListAsync(cancellationToken);
         }
+
+        public async Task<Class?> GetClassByJoinNameAsync(string joinName, CancellationToken cancellationToken)
+        {
+            return await _context.Classes
+                /*.Include(c => c.ClassId)*/
+                .Include(c => c.Teacher)
+                    .ThenInclude(t => t.User)
+                .Include(c => c.ClassStudents)
+                    .ThenInclude(cs => cs.User)
+                .Include(c => c.Repositories)
+                .FirstOrDefaultAsync(c => c.ClassJoinName == joinName, cancellationToken);
+        }
     }
 }
