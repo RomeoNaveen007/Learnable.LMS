@@ -94,16 +94,19 @@ namespace Learnable.Infrastructure.Persistence.Data
             // -------------------- ClassStudent --------------------
             modelBuilder.Entity<ClassStudent>(entity =>
             {
-                entity.HasKey(e => new { e.ClassId, e.StudentId });
+                entity.HasKey(e => new { e.ClassId, e.UserId });
+
                 entity.Property(e => e.JoinDate).HasDefaultValueSql("(getdate())");
                 entity.Property(e => e.StudentStatus).HasDefaultValue("Active");
 
                 entity.HasOne(d => d.Class)
                       .WithMany(p => p.ClassStudents)
+                      .HasForeignKey(d => d.ClassId)
                       .OnDelete(DeleteBehavior.ClientSetNull);
 
-                entity.HasOne(d => d.Student)
+                entity.HasOne(d => d.User)
                       .WithMany(p => p.ClassStudents)
+                      .HasForeignKey(d => d.UserId)   // <-- important
                       .OnDelete(DeleteBehavior.ClientSetNull);
             });
 

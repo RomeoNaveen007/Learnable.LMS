@@ -4,6 +4,7 @@ using Learnable.Infrastructure.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Learnable.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251124171208_First")]
+    partial class First
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -292,29 +295,6 @@ namespace Learnable.Infrastructure.Migrations
                     b.ToTable("Marks");
                 });
 
-            modelBuilder.Entity("Learnable.Domain.Entities.Ocr_Skan", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("AssetId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("AssetsProfileId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("OcrText")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AssetId");
-
-                    b.HasIndex("AssetsProfileId");
-
-                    b.ToTable("Ocr_Skans");
-                });
-
             modelBuilder.Entity("Learnable.Domain.Entities.Prompt", b =>
                 {
                     b.Property<Guid>("Id")
@@ -335,9 +315,6 @@ namespace Learnable.Infrastructure.Migrations
             modelBuilder.Entity("Learnable.Domain.Entities.Repository", b =>
                 {
                     b.Property<Guid>("RepoId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("AssetsProfileId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("ClassId")
@@ -367,8 +344,6 @@ namespace Learnable.Infrastructure.Migrations
                         .HasDefaultValue("Active");
 
                     b.HasKey("RepoId");
-
-                    b.HasIndex("AssetsProfileId");
 
                     b.HasIndex("ClassId");
 
@@ -620,27 +595,8 @@ namespace Learnable.Infrastructure.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("Learnable.Domain.Entities.Ocr_Skan", b =>
-                {
-                    b.HasOne("Learnable.Domain.Entities.Asset", "Asset")
-                        .WithMany()
-                        .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Learnable.Domain.Entities.Asset", null)
-                        .WithMany("OcrScans")
-                        .HasForeignKey("AssetsProfileId");
-
-                    b.Navigation("Asset");
-                });
-
             modelBuilder.Entity("Learnable.Domain.Entities.Repository", b =>
                 {
-                    b.HasOne("Learnable.Domain.Entities.Asset", null)
-                        .WithMany("Repo_List")
-                        .HasForeignKey("AssetsProfileId");
-
                     b.HasOne("Learnable.Domain.Entities.Class", "Class")
                         .WithMany("Repositories")
                         .HasForeignKey("ClassId");
@@ -679,13 +635,6 @@ namespace Learnable.Infrastructure.Migrations
                         .HasForeignKey("Learnable.Domain.Entities.Teacher", "UserId");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Learnable.Domain.Entities.Asset", b =>
-                {
-                    b.Navigation("OcrScans");
-
-                    b.Navigation("Repo_List");
                 });
 
             modelBuilder.Entity("Learnable.Domain.Entities.Class", b =>

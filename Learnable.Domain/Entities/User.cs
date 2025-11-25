@@ -53,5 +53,9 @@ public partial class User
     public virtual Student? Student { get; set; }
 
     [InverseProperty("User")]
+    public virtual ICollection<ClassStudent> ClassStudents { get; set; } = new List<ClassStudent>();
+
+
+    [InverseProperty("User")]
     public virtual Teacher? Teacher { get; set; }
 }
