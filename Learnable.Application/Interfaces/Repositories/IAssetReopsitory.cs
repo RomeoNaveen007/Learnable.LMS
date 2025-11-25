@@ -8,7 +8,10 @@ using System.Threading.Tasks;
 
 namespace Learnable.Application.Interfaces.Repositories
 {
-    internal interface IAssetReopsitory : IGenericRepository<Asset>
+    public interface IAssetReopsitory : IGenericRepository<Asset>
     {
+        Task<Asset?> GetAssetWithOcrAsync(Guid assetId);
+        Task<Asset> AddAssetWithOcrAsync(Asset asset, List<OcrPdf> ocrPdfs);
+        Task<bool> DeleteAssetWithOcrAsync(Guid assetId);
     }
 }
