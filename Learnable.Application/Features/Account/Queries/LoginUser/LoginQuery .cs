@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Learnable.Application.Features.Users.Queries.LoginUser
 {
-    public record LoginQuery(string Email, string Password) : IRequest<UserDto>;
+    public record LoginQuery(string Email, string Password) : IRequest<LoginResponseDto>;
 
 }
 
