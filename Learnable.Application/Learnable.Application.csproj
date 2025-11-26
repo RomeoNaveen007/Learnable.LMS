@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <Folder Include="Features\Asset\Queries\" />
+    <Folder Include="Features\RequestNotification\Queries\" />
   </ItemGroup>
 
 </Project>

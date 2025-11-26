@@ -36,6 +36,10 @@ public partial class Class
     public virtual ICollection<ClassStudent> ClassStudents { get; set; } = new List<ClassStudent>();
 
     [InverseProperty("Class")]
+    public virtual ICollection<RequestNotification> RequestNotifications { get; set; } = new List<RequestNotification>();
+
+
+    [InverseProperty("Class")]
     public virtual ICollection<Repository> Repositories { get; set; } = new List<Repository>();
 
     [ForeignKey("TeacherId")]
