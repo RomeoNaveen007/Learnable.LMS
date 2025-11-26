@@ -27,7 +27,7 @@ namespace Learnable.Application.Features.Teacher.Commands.DeleteTeacher
         public async Task<bool> Handle(DeleteTeacherCommand request, CancellationToken cancellationToken)
         {
             // Get teacher with user reference
-            var teacher = await _teacherRepository.GetTeacherByProfileIdAsync(request.ProfileId, cancellationToken);
+            var teacher = await _teacherRepository.GetTeacherWithUserAndClassesAsync(request.ProfileId, cancellationToken);
 
             if (teacher == null)
                 return false;
@@ -42,7 +42,7 @@ namespace Learnable.Application.Features.Teacher.Commands.DeleteTeacher
             await _teacherRepository.DeleteAsync(teacher);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-            
+
             return true;
         }
     }

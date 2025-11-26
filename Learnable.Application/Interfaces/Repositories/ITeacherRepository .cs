@@ -10,8 +10,9 @@ namespace Learnable.Application.Interfaces.Repositories
 {
     public interface ITeacherRepository : IGenericRepository<Teacher>
     {
-        Task<Teacher?> GetTeacherByProfileIdAsync(Guid profileId, CancellationToken cancellationToken);
-        Task<Teacher?> GetTeacherWithUserAsync(Guid userId, CancellationToken cancellationToken);
+        Task<Teacher?> GetTeacherWithUserAndClassesAsync(Guid profileId, CancellationToken cancellationToken);
+        Task<List<Teacher>> GetAllTeachersWithUserAndClassesAsync();
+        Task<Teacher?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken);
 
     }
 }

@@ -152,7 +152,22 @@ namespace Learnable.Infrastructure.Persistence.Data
                       .WithMany(p => p.Repositories);
             });
 
-            // -------------------- RequestNotification --------------------
+            //// -------------------- RequestNotification --------------------
+            //modelBuilder.Entity<RequestNotification>(entity =>
+            //{
+            //    entity.HasKey(e => e.NotificationId);
+            //    entity.Property(e => e.NotificationId).ValueGeneratedNever();
+            //    entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+            //    entity.Property(e => e.NotificationStatus).HasDefaultValue("Sent");
+
+            //    entity.HasOne(d => d.Receiver)
+            //          .WithMany(p => p.RequestNotificationReceivers);
+
+            //    entity.HasOne(d => d.Sender)
+            //          .WithMany(p => p.RequestNotificationSenders);
+            //});
+
+
             modelBuilder.Entity<RequestNotification>(entity =>
             {
                 entity.HasKey(e => e.NotificationId);
@@ -161,11 +176,21 @@ namespace Learnable.Infrastructure.Persistence.Data
                 entity.Property(e => e.NotificationStatus).HasDefaultValue("Sent");
 
                 entity.HasOne(d => d.Receiver)
-                      .WithMany(p => p.RequestNotificationReceivers);
+                      .WithMany(p => p.RequestNotificationReceivers)
+                      .HasForeignKey(d => d.ReceiverId)
+                      .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(d => d.Sender)
-                      .WithMany(p => p.RequestNotificationSenders);
+                      .WithMany(p => p.RequestNotificationSenders)
+                      .HasForeignKey(d => d.SenderId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(d => d.Class)
+                      .WithMany(c => c.RequestNotifications)
+                      .HasForeignKey(d => d.ClassId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
+
 
             // -------------------- Student --------------------
             modelBuilder.Entity<Student>(entity =>

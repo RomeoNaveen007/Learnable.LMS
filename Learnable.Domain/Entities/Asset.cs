@@ -14,7 +14,7 @@ public partial class Asset
     public Guid? RepoId { get; set; }
 
     [StringLength(50)]
-    public string Type { get; set; } = null!;
+    public string Type { get; set; } = null!;//link or pdf
 
     [StringLength(150)]
     public string Title { get; set; } = null!;
@@ -33,4 +33,6 @@ public partial class Asset
     [ForeignKey("RepoId")]
     [InverseProperty("Assets")]
     public virtual Repository? Repo { get; set; }
+    public virtual ICollection<OcrPdf> OcrPdfs { get; set; }
+
 }
