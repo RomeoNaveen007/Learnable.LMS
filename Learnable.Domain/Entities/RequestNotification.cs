@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace Learnable.Domain.Entities;
-
 [Table("RequestNotification")]
 public partial class RequestNotification
 {
@@ -13,8 +12,9 @@ public partial class RequestNotification
     public Guid NotificationId { get; set; }
 
     public Guid? SenderId { get; set; }
-
     public Guid? ReceiverId { get; set; }
+
+    public Guid? ClassId { get; set; }
 
     [StringLength(50)]
     public string? NotificationStatus { get; set; }
@@ -29,4 +29,7 @@ public partial class RequestNotification
     [ForeignKey("SenderId")]
     [InverseProperty("RequestNotificationSenders")]
     public virtual User? Sender { get; set; }
+
+    [ForeignKey("ClassId")]
+    public virtual Class? Class { get; set; }
 }

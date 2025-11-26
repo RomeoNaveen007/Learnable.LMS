@@ -36,9 +36,6 @@ namespace Learnable.Infrastructure.Persistence.Data
         public virtual DbSet<SmtpSetting> SmtpSettings { get; set; }
         public virtual DbSet<ApiException> ApiExceptions { get; set; }
 
-        // ⭐ Added new DbSet for OCR PDF
-        public virtual DbSet<OcrPdf> OcrPdfs { get; set; }
-
         // ============================================================
         //                       Database Config
         // ============================================================
@@ -108,7 +105,7 @@ namespace Learnable.Infrastructure.Persistence.Data
 
                 entity.HasOne(d => d.User)
                       .WithMany(p => p.ClassStudents)
-                      .HasForeignKey(d => d.UserId)
+                      .HasForeignKey(d => d.UserId)   // <-- important
                       .OnDelete(DeleteBehavior.ClientSetNull);
             });
 
@@ -155,7 +152,22 @@ namespace Learnable.Infrastructure.Persistence.Data
                       .WithMany(p => p.Repositories);
             });
 
-            // -------------------- RequestNotification --------------------
+            //// -------------------- RequestNotification --------------------
+            //modelBuilder.Entity<RequestNotification>(entity =>
+            //{
+            //    entity.HasKey(e => e.NotificationId);
+            //    entity.Property(e => e.NotificationId).ValueGeneratedNever();
+            //    entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+            //    entity.Property(e => e.NotificationStatus).HasDefaultValue("Sent");
+
+            //    entity.HasOne(d => d.Receiver)
+            //          .WithMany(p => p.RequestNotificationReceivers);
+
+            //    entity.HasOne(d => d.Sender)
+            //          .WithMany(p => p.RequestNotificationSenders);
+            //});
+
+
             modelBuilder.Entity<RequestNotification>(entity =>
             {
                 entity.HasKey(e => e.NotificationId);
@@ -164,11 +176,21 @@ namespace Learnable.Infrastructure.Persistence.Data
                 entity.Property(e => e.NotificationStatus).HasDefaultValue("Sent");
 
                 entity.HasOne(d => d.Receiver)
-                      .WithMany(p => p.RequestNotificationReceivers);
+                      .WithMany(p => p.RequestNotificationReceivers)
+                      .HasForeignKey(d => d.ReceiverId)
+                      .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(d => d.Sender)
-                      .WithMany(p => p.RequestNotificationSenders);
+                      .WithMany(p => p.RequestNotificationSenders)
+                      .HasForeignKey(d => d.SenderId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(d => d.Class)
+                      .WithMany(c => c.RequestNotifications)
+                      .HasForeignKey(d => d.ClassId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
+
 
             // -------------------- Student --------------------
             modelBuilder.Entity<Student>(entity =>
@@ -235,18 +257,6 @@ namespace Learnable.Infrastructure.Persistence.Data
 
                 entity.Property(e => e.Details)
                       .HasMaxLength(2000);
-            });
-
-            // -------------------- OcrPdf (New) --------------------
-            modelBuilder.Entity<OcrPdf>(entity =>
-            {
-                entity.HasKey(e => e.OcrPdfId);
-                entity.Property(e => e.OcrPdfId).ValueGeneratedNever();
-
-                entity.HasOne(d => d.Asset)
-                      .WithMany(p => p.OcrPdfs)
-                      .HasForeignKey(d => d.AssetId)
-                      .OnDelete(DeleteBehavior.Cascade);
             });
 
             OnModelCreatingPartial(modelBuilder);
