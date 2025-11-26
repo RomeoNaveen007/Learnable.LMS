@@ -4,6 +4,7 @@ using Learnable.Application.Features.Class.Commands.UpdateClass;
 using Learnable.Application.Features.Class.Queries;
 using Learnable.Application.Features.Class.Queries.GetAll;
 using Learnable.Application.Features.Class.Queries.GetById;
+using Learnable.Application.Features.Class.Queries.GetByUnicName;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -65,6 +66,22 @@ namespace Learnable.WebApi.Controllers
         public async Task<ActionResult> GetClassById(Guid id)
         {
             var result = await _mediator.Send(new GetClassByIdQuery { ClassId = id });
+
+            if (result == null)
+                return NotFound(new { message = "Class not found" });
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Get class by id
+        /// GET: /api/Class/{id}
+        /// </summary>"{unicname}"
+        [HttpGet("{unicname}")]
+        /// GET: http://localhost:5071/api/Class/unicname
+        public async Task<ActionResult> GetClassByUnicname(string unicname)
+        {
+            var result = await _mediator.Send(new GetClassByUnicNameQuery { UnicName = unicname });
 
             if (result == null)
                 return NotFound(new { message = "Class not found" });

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Learnable.Application.Interfaces.Services.External
+namespace Learnable.Application.Features.Class.Queries.GetByUnicName
 {
-    public interface IAiApiService
+    public class GetClassByUnicNameValidator
     {
     }
 }

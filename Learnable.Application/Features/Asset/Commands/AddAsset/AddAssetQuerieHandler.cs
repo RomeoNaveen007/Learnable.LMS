@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Learnable.Application.Interfaces.Services.External
+namespace Learnable.Application.Features.Asset.Commands.AddAsset
 {
-    public interface IAiApiService
+    internal class AddAssetQuerieHandler
     {
     }
 }
