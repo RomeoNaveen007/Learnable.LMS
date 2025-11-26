@@ -53,6 +53,9 @@ namespace Learnable.Infrastructure
             services.AddScoped<IUserRepository, UserRepository>();
 
 
+            services.AddScoped<IRequestNotificationRepository, RequestNotificationRepository>();
+
+
             services.AddScoped<IClassStudentRepository, ClassStudentRepository>();
 
             // Teacher Repository

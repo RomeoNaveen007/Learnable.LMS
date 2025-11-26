@@ -35,5 +35,11 @@ namespace Learnable.Infrastructure.Implementations.Repositories
                 .Where(cs => cs.ClassId == classId)
                 .ToListAsync(cancellationToken);
         }
+
+        public async Task<bool> IsStudentAlreadyJoinedAsync(Guid classId, Guid userId, CancellationToken ct)
+        {
+            return await _context.ClassStudents
+                .AnyAsync(cs => cs.ClassId == classId && cs.UserId == userId, ct);
+        }
     }
 }
