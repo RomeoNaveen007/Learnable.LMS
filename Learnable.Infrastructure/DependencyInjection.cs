@@ -6,6 +6,7 @@ using Learnable.Application.Interfaces.Repositories;
 using Learnable.Application.Interfaces.Repositories.Generic;
 using Learnable.Application.Interfaces.Services;
 using Learnable.Domain.Common.Email;
+using Learnable.Domain.Entities;
 using Learnable.Infrastructure.Implementations.Repositories;
 using Learnable.Infrastructure.Implementations.Repositories.Generic;
 using Learnable.Infrastructure.Implementations.Services.Internal;
@@ -46,6 +47,9 @@ namespace Learnable.Infrastructure
 
             // User Repository
             services.AddScoped<IUserRepository, UserRepository>();
+
+            // User Repository
+            services.AddScoped<IRepositoryRepository, RepositoryRepository>();
 
 
             services.AddScoped<IClassStudentRepository, ClassStudentRepository>();
