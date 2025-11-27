@@ -30,6 +30,9 @@ public partial class Exam
     [InverseProperty("Exam")]
     public virtual ICollection<Mark> Marks { get; set; } = new List<Mark>();
 
+    [InverseProperty("Exam")]
+    public virtual ICollection<ExamQuestion> Questions { get; set; } = new List<ExamQuestion>();
+
     [ForeignKey("RepoId")]
     [InverseProperty("Exams")]
     public virtual Repository? Repo { get; set; }
