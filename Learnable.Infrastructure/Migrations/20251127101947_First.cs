@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Learnable.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class NewCreate : Migration
+    public partial class First : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -208,7 +208,7 @@ namespace Learnable.Infrastructure.Migrations
                 columns: table => new
                 {
                     RepoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ClassId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ClassId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     RepoName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     RepoDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RepoCertification = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
@@ -222,7 +222,8 @@ namespace Learnable.Infrastructure.Migrations
                         name: "FK_Repository_Class_ClassId",
                         column: x => x.ClassId,
                         principalTable: "Class",
-                        principalColumn: "ClassId");
+                        principalColumn: "ClassId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(

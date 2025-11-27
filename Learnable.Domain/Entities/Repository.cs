@@ -10,9 +10,9 @@ namespace Learnable.Domain.Entities;
 public partial class Repository
 {
     [Key]
-    public Guid RepoId { get; set; }
+    public Guid? RepoId { get; set; }
 
-    public Guid? ClassId { get; set; }
+    public Guid ClassId { get; set; }
 
     [StringLength(100)]
     public string RepoName { get; set; } = null!;

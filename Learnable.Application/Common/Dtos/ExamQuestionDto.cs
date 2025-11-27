@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Learnable.Application.Common.Dtos
 {
-    internal class ExamQuestionDto
+    public class ExamQuestionDto
     {
         public Guid QuestionId { get; set; }
         public Guid ExamId { get; set; }
