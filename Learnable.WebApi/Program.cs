@@ -1,4 +1,4 @@
-using Learnable.Application.Features.Users.Commands.RegisterUser;
+using Learnable.Application.Features.Account.Commands.RegisterUser;
 using Learnable.Application.Interfaces.Repositories.Generic;
 using Learnable.Application.Interfaces.Services;
 using Learnable.Infrastructure;

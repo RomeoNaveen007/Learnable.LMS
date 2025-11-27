@@ -1,5 +1,5 @@
 ﻿using Learnable.Application.Common.Dtos;
-using Learnable.Application.Features.Users.Commands.RegisterUser;
+using Learnable.Application.Features.Account.Commands.RegisterUser;
 using MediatR;
 using System;
 using System.Collections.Generic;
