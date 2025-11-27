@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace Learnable.Application.Common.Dtos
 {
-    internal class AssetDto
+    public class AssetDto
     {
         public Guid AssetId { get; set; }
-        public string Type { get; set; } = null!;
-        public string Title { get; set; } = null!;
+        public string Type { get; set; }
+        public string Title { get; set; }
+        public Guid RepoId { get; set; }
         public string? Description { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? LastUpdatedAt { get; set; }
-        public string Url { get; set; } = null!;
-
-        public List<OcrPdfDto> OcrPdfs { get; set; } = new();
+        public string Url { get; set; }
+        public List<OcrPdfDto> OcrPdfs { get; set; }
     }
 }

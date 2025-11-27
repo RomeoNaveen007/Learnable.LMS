@@ -11,7 +11,7 @@ namespace Learnable.Application.Interfaces.Repositories
     public interface IAssetReopsitory : IGenericRepository<Asset>
     {
         Task<Asset?> GetAssetWithOcrAsync(Guid assetId);
-        Task<Asset> AddAssetWithOcrAsync(Asset asset, List<OcrPdf> ocrPdfs);
+        Task<Asset> AddAssetWithOcrAsync(Asset asset);
         Task<bool> DeleteAssetWithOcrAsync(Guid assetId);
     }
 }

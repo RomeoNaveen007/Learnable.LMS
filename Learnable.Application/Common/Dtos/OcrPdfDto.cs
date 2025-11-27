@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Learnable.Application.Common.Dtos
 {
-    internal class OcrPdfDto
+    public class OcrPdfDto // Changed from internal to public
     {
         public Guid OcrPdfId { get; set; }
         public int ChunkId { get; set; }
-        public string Chunk { get; set; } = null!;
+        public string Chunk { get; set; }
     }
 }
