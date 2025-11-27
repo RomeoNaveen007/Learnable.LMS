@@ -363,7 +363,7 @@ namespace Learnable.Infrastructure.Migrations
                     b.Property<Guid>("RepoId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ClassId")
+                    b.Property<Guid>("ClassId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("CreatedAt")
@@ -672,7 +672,9 @@ namespace Learnable.Infrastructure.Migrations
                 {
                     b.HasOne("Learnable.Domain.Entities.Class", "Class")
                         .WithMany("Repositories")
-                        .HasForeignKey("ClassId");
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Class");
                 });

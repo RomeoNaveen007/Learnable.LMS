@@ -57,7 +57,7 @@ namespace Learnable.Application.Features.Class.Queries
                 Repositories = data.Repositories?
                     .Select(r => new RepositoryDto
                     {
-                        RepositoryId = r.RepoId,
+                        RepositoryId = (Guid)r.RepoId,
                         FileName = r.RepoName ?? string.Empty
                     }).ToList() ?? new List<RepositoryDto>()
             };

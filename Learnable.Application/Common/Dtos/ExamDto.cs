@@ -1,5 +1,4 @@
-﻿using Learnable.Domain.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Learnable.Application.Common.Dtos
 {
-    internal class ExamDto
+    public class ExamDto
     {
         public Guid ExamId { get; set; }
         public Guid? RepoId { get; set; }
@@ -19,7 +18,7 @@ namespace Learnable.Application.Common.Dtos
 
 
 
-        public virtual ICollection<Mark> Marks { get; set; } = new List<Mark>();
-        public virtual ICollection<ExamQuestion> Questions { get; set; } = new List<ExamQuestion>();
+        /*public virtual ICollection<Mark> Marks { get; set; } = new List<Mark>();*/
+        public virtual ICollection<ExamQuestionDto> Questions { get; set; } = new List<ExamQuestionDto>();
     }
 }
