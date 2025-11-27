@@ -1,31 +1,45 @@
 ﻿using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Learnable.Application.Features.Users.Commands.RegisterUser
+namespace Learnable.Application.Features.Account.Commands.RegisterUser
 {
     public class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
     {
         public RegisterUserCommandValidator()
         {
-            RuleFor(x => x.Dto.Email).NotEmpty().EmailAddress();
-            RuleFor(x => x.Dto.Username).NotEmpty().MinimumLength(3);
-            RuleFor(x => x.Dto.Password).NotEmpty().MinimumLength(6);
+            // Ensure DTO exists
+            RuleFor(x => x.Dto)
+                .NotNull()
+                .WithMessage("User data is required.");
 
+            // ---- Email ----
+            RuleFor(x => x.Dto.Email)
+                .NotEmpty().WithMessage("Email is required.")
+                .EmailAddress().WithMessage("Invalid email format.");
+
+            // ---- Username ----
+            RuleFor(x => x.Dto.Username)
+                .NotEmpty().WithMessage("Username is required.")
+                .MinimumLength(3).WithMessage("Username must be at least 3 characters.");
+
+            // ---- Password ----
+            RuleFor(x => x.Dto.Password)
+                .NotEmpty().WithMessage("Password is required.")
+                .MinimumLength(6).WithMessage("Password must be at least 6 characters.");
+
+            // ---- Display Name (Optional) ----
             RuleFor(x => x.Dto.DisplayName)
-            .MaximumLength(100)
-            .When(x => !string.IsNullOrEmpty(x.Dto.DisplayName));
+                .MaximumLength(100)
+                .When(x => !string.IsNullOrWhiteSpace(x.Dto.DisplayName));
 
-            RuleFor(x => x.Dto.FullName)    
-                .MaximumLength(100);
+            // ---- Full Name (Optional) ----
+            RuleFor(x => x.Dto.FullName)
+                .MaximumLength(100)
+                .When(x => !string.IsNullOrWhiteSpace(x.Dto.FullName));
 
+            // ---- OTP ----
             RuleFor(x => x.OtpCode)
-                .NotEmpty()
-                .Matches(@"^\d{4}$")
-                .WithMessage("OTP must be a 4-digit number");
+                .NotEmpty().WithMessage("OTP is required.")
+                .Matches(@"^\d{4}$").WithMessage("OTP must be a 4-digit number.");
         }
     }
 }

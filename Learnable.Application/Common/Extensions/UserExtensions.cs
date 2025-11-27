@@ -21,7 +21,26 @@ namespace Learnable.Application.Common.Extensions
                 DisplayName = user.DisplayName,
                 FullName = user.FullName,
                 Role = user.Role,
-                Token = tokenService.CreateToken(user)
+                Token = tokenService.CreateToken(user),
+            };
+        }
+
+        public static UserWithClassesDto ToUserWithClassesDto(
+            this User user,
+            IEnumerable<Class> classes,
+            ITokenService tokenService)
+        {
+            return new UserWithClassesDto
+            {
+                UserId = user.UserId,
+                Email = user.Email,
+                Username = user.Username,
+                DisplayName = user.DisplayName,
+                FullName = user.FullName,
+                Role = user.Role,
+                Token = tokenService.CreateToken(user),
+
+                Classes = [.. classes.Select(c => c.ToDto())]
             };
         }
     }

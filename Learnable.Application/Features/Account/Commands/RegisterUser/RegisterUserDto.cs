@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Learnable.Application.Common.Dtos;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Learnable.Application.Features.Users.Commands.RegisterUser
+namespace Learnable.Application.Features.Account.Commands.RegisterUser
 {
     public class RegisterUserDto
     {

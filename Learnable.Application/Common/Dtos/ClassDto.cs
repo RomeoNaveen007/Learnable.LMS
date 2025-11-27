@@ -26,8 +26,8 @@ namespace Learnable.Application.Common.Dtos
         public string? Status { get; set; }
 
         public ClassTeacherDto? Teacher { get; set; }
-        public List<StudentDto> Students { get; set; } = new();
-        public List<RepositoryDto> Repositories { get; set; } = new();
+        public List<StudentDto> Students { get; set; } = [];
+        public List<RepositoryDto> Repositories { get; set; } = [];
     }
 
     public class ClassTeacherDto
