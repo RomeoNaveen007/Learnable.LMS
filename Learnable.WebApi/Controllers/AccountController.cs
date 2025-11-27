@@ -1,6 +1,7 @@
 ﻿using Learnable.Application.Common.Dtos;
 using Learnable.Application.Common.Extensions;
 using Learnable.Application.Features.Account.Commands.RegisterTeacher;
+using Learnable.Application.Features.Account.Queries.LoginUser;
 using Learnable.Application.Features.Users.Commands.RegisterUser;
 using Learnable.Application.Features.Users.Queries.LoginUser;
 using Learnable.Application.Features.Verifications.Commands.SendOtp;
@@ -43,12 +44,13 @@ namespace Learnable.WebApi.Controllers
         }
 
         [HttpPost("login")]   //  http://localhost:5071/api/Account/login
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
-            var query = new LoginQuery(request.Email, request.Password);
-            var result = await _mediator.Send(query);
+            var result = await _mediator.Send(
+                new LoginQuery(dto.Email, dto.Password)    
+            );
 
-            return Ok(result);
+            return Ok(result); // returns LoginResponseDto
         }
 
         [HttpPost("register-teacher")]

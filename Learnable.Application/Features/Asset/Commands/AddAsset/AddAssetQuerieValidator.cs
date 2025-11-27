@@ -8,5 +8,6 @@ namespace Learnable.Application.Features.Asset.Commands.AddAsset
 {
     internal class AddAssetQuerieValidator
     {
+
     }
 }

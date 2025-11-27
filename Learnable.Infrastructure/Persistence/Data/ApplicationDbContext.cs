@@ -5,9 +5,6 @@ using Learnable.Domain.Errors;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Learnable.Infrastructure.Persistence.Data
 {
@@ -25,6 +22,7 @@ namespace Learnable.Infrastructure.Persistence.Data
         public virtual DbSet<Class> Classes { get; set; }
         public virtual DbSet<ClassStudent> ClassStudents { get; set; }
         public virtual DbSet<Exam> Exams { get; set; }
+        public virtual DbSet<ExamQuestion> ExamQuestions { get; set; } // <-- new
         public virtual DbSet<Mark> Marks { get; set; }
         public virtual DbSet<Prompt> Prompts { get; set; }
         public virtual DbSet<Repository> Repositories { get; set; }
@@ -53,6 +51,8 @@ namespace Learnable.Infrastructure.Persistence.Data
         // ============================================================
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            var jsonOptions = new System.Text.Json.JsonSerializerOptions { WriteIndented = false };
+
             // -------------------- Asset --------------------
             modelBuilder.Entity<Asset>(entity =>
             {
@@ -105,7 +105,7 @@ namespace Learnable.Infrastructure.Persistence.Data
 
                 entity.HasOne(d => d.User)
                       .WithMany(p => p.ClassStudents)
-                      .HasForeignKey(d => d.UserId)   // <-- important
+                      .HasForeignKey(d => d.UserId)
                       .OnDelete(DeleteBehavior.ClientSetNull);
             });
 
@@ -117,6 +117,34 @@ namespace Learnable.Infrastructure.Persistence.Data
 
                 entity.HasOne(d => d.Repo)
                       .WithMany(p => p.Exams);
+
+                entity.HasMany(d => d.Questions)
+                      .WithOne(q => q.Exam)
+                      .HasForeignKey(q => q.ExamId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // -------------------- ExamQuestion --------------------
+            modelBuilder.Entity<ExamQuestion>(entity =>
+            {
+                entity.HasKey(e => e.QuestionId);
+                entity.Property(e => e.QuestionId).ValueGeneratedNever();
+
+                entity.Property(e => e.Question).IsRequired();
+
+                // JSON conversion with explicit options
+                entity.Property(e => e.Answers)
+                      .HasConversion(
+                          v => System.Text.Json.JsonSerializer.Serialize(v, jsonOptions),
+                          v => System.Text.Json.JsonSerializer.Deserialize<List<string>>(v, jsonOptions) ?? new List<string>())
+                      .HasColumnType("nvarchar(max)");
+
+                entity.Property(e => e.CorrectAnswerIndex).IsRequired();
+
+                entity.HasOne(d => d.Exam)
+                      .WithMany(p => p.Questions)
+                      .HasForeignKey(d => d.ExamId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
             // -------------------- Mark --------------------
@@ -152,22 +180,7 @@ namespace Learnable.Infrastructure.Persistence.Data
                       .WithMany(p => p.Repositories);
             });
 
-            //// -------------------- RequestNotification --------------------
-            //modelBuilder.Entity<RequestNotification>(entity =>
-            //{
-            //    entity.HasKey(e => e.NotificationId);
-            //    entity.Property(e => e.NotificationId).ValueGeneratedNever();
-            //    entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
-            //    entity.Property(e => e.NotificationStatus).HasDefaultValue("Sent");
-
-            //    entity.HasOne(d => d.Receiver)
-            //          .WithMany(p => p.RequestNotificationReceivers);
-
-            //    entity.HasOne(d => d.Sender)
-            //          .WithMany(p => p.RequestNotificationSenders);
-            //});
-
-
+            // -------------------- RequestNotification --------------------
             modelBuilder.Entity<RequestNotification>(entity =>
             {
                 entity.HasKey(e => e.NotificationId);
@@ -190,7 +203,6 @@ namespace Learnable.Infrastructure.Persistence.Data
                       .HasForeignKey(d => d.ClassId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
-
 
             // -------------------- Student --------------------
             modelBuilder.Entity<Student>(entity =>
