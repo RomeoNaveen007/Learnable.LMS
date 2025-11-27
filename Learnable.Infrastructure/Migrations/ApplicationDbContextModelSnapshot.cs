@@ -270,6 +270,32 @@ namespace Learnable.Infrastructure.Migrations
                     b.ToTable("Exam");
                 });
 
+            modelBuilder.Entity("Learnable.Domain.Entities.ExamQuestion", b =>
+                {
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Answers")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CorrectAnswerIndex")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ExamId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Question")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("QuestionId");
+
+                    b.HasIndex("ExamId");
+
+                    b.ToTable("ExamQuestion");
+                });
+
             modelBuilder.Entity("Learnable.Domain.Entities.Mark", b =>
                 {
                     b.Property<Guid>("ExamId")
@@ -603,6 +629,17 @@ namespace Learnable.Infrastructure.Migrations
                     b.Navigation("Repo");
                 });
 
+            modelBuilder.Entity("Learnable.Domain.Entities.ExamQuestion", b =>
+                {
+                    b.HasOne("Learnable.Domain.Entities.Exam", "Exam")
+                        .WithMany("Questions")
+                        .HasForeignKey("ExamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Exam");
+                });
+
             modelBuilder.Entity("Learnable.Domain.Entities.Mark", b =>
                 {
                     b.HasOne("Learnable.Domain.Entities.Exam", "Exam")
@@ -701,6 +738,8 @@ namespace Learnable.Infrastructure.Migrations
             modelBuilder.Entity("Learnable.Domain.Entities.Exam", b =>
                 {
                     b.Navigation("Marks");
+
+                    b.Navigation("Questions");
                 });
 
             modelBuilder.Entity("Learnable.Domain.Entities.Repository", b =>

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Learnable.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class FirstMigration : Migration
+    public partial class NewCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -325,6 +325,27 @@ namespace Learnable.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ExamQuestion",
+                columns: table => new
+                {
+                    QuestionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ExamId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Question = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Answers = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CorrectAnswerIndex = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExamQuestion", x => x.QuestionId);
+                    table.ForeignKey(
+                        name: "FK_ExamQuestion_Exam_ExamId",
+                        column: x => x.ExamId,
+                        principalTable: "Exam",
+                        principalColumn: "ExamId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Marks",
                 columns: table => new
                 {
@@ -383,6 +404,11 @@ namespace Learnable.Infrastructure.Migrations
                 name: "IX_Exam_RepoId",
                 table: "Exam",
                 column: "RepoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExamQuestion_ExamId",
+                table: "ExamQuestion",
+                column: "ExamId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Marks_StudentId",
@@ -457,6 +483,9 @@ namespace Learnable.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "ClassStudent");
+
+            migrationBuilder.DropTable(
+                name: "ExamQuestion");
 
             migrationBuilder.DropTable(
                 name: "Marks");

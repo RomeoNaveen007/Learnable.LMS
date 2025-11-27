@@ -30,10 +30,8 @@ namespace Learnable.Infrastructure.Implementations.Repositories
         // =====================================================
         // ⭐ Add Asset with OCR PDF list
         // =====================================================
-        public async Task<Asset> AddAssetWithOcrAsync(Asset asset, List<OcrPdf> ocrPdfs)
+        public async Task<Asset> AddAssetWithOcrAsync(Asset asset)
         {
-            // Assign OCR list to Asset
-            asset.OcrPdfs = ocrPdfs;
 
             // Add Asset (cascades OcrPdf because of relationship)
             await _context.Assets.AddAsync(asset);
