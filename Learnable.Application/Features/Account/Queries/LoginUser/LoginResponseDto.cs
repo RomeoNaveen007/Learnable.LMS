@@ -1,5 +1,4 @@
 ﻿using Learnable.Application.Common.Dtos;
-using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +7,9 @@ using System.Threading.Tasks;
 
 namespace Learnable.Application.Features.Users.Queries.LoginUser
 {
-    public record LoginQuery(string Email, string Password) : IRequest<LoginResponseDto>;
-
+    public class LoginResponseDto
+    {
+        public UserDto User { get; set; } = null!;
+        public TeacherDto? Teacher { get; set; }
+    }
 }
-
