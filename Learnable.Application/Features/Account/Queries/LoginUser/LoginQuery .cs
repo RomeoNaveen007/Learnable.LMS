@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Learnable.Application.Features.Users.Queries.LoginUser
+namespace Learnable.Application.Features.Account.Queries.LoginUser
 {
     public record LoginQuery(string Email, string Password) : IRequest<LoginResponseDto>;
 
