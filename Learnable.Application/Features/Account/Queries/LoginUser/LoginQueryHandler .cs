@@ -3,40 +3,27 @@ using Learnable.Application.Common.Extensions;
 using Learnable.Application.Interfaces.Repositories;
 using Learnable.Application.Interfaces.Services;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Learnable.Application.Features.Users.Queries.LoginUser
+namespace Learnable.Application.Features.Account.Queries.LoginUser
 {
-    public class LoginQueryHandler : IRequestHandler<LoginQuery, LoginResponseDto>
+    public class LoginQueryHandler(
+        IUserRepository userRepository,
+        ITeacherRepository teacherRepository,
+        IClassStudentRepository classStudentRepo,
+        ITokenService tokenService,
+        IPasswordService passwordService)
+        : IRequestHandler<LoginQuery, LoginResponseDto>
     {
-        private readonly IUserRepository _userRepository;
-        private readonly ITeacherRepository _teacherRepository;
-        private readonly ITokenService _tokenService;
-        private readonly IPasswordService _passwordService;
+        private readonly IUserRepository _userRepository = userRepository;
+        private readonly ITeacherRepository _teacherRepository = teacherRepository;
+        private readonly IClassStudentRepository _classStudentRepo = classStudentRepo;
+        private readonly ITokenService _tokenService = tokenService;
+        private readonly IPasswordService _passwordService = passwordService;
 
-        public LoginQueryHandler(
-            IUserRepository userRepository,
-            ITeacherRepository teacherRepository,
-            ITokenService tokenService,
-            IPasswordService passwordService)
-        {
-            _userRepository = userRepository;
-            _teacherRepository = teacherRepository;
-            _tokenService = tokenService;
-            _passwordService = passwordService;
-        }
-
-        public async Task<LoginResponseDto> Handle(
-            LoginQuery request,
-            CancellationToken cancellationToken)
+        public async Task<LoginResponseDto> Handle(LoginQuery request, CancellationToken cancellationToken)
         {
             // 1. Find user by email
             var user = await _userRepository.GetByEmailAsync(request.Email, cancellationToken);
-
             if (user == null)
                 throw new Exception("Invalid email or password.");
 
@@ -44,39 +31,35 @@ namespace Learnable.Application.Features.Users.Queries.LoginUser
             var passwordOk = _passwordService.VerifyPassword(
                 request.Password,
                 user.PasswordHash,
-                user.PasswordSalt
-            );
+                user.PasswordSalt);
 
             if (!passwordOk)
                 throw new Exception("Invalid email or password.");
 
-            // 3. Convert to UserDto (includes JWT)
-            var userDto = user.ToDto(_tokenService);
-
             TeacherDto? teacherDto = null;
+            UserWithClassesDto? studentDto = null;
 
-            // 4. If user is teacher → load teacher profile + classes
+            // ------------------- ROLE CHECK -------------------
             if (user.Role == "Teacher")
             {
-                var teacher = await _teacherRepository.GetByUserIdAsync(
-                    user.UserId,
-                    cancellationToken
-                );
-
-                if (teacher != null)
-                {
-                    // Convert entity → extended DTO (with User + Classes)
-                    teacherDto = teacher.ToDto();
-                }
+                var teacher = await _teacherRepository.GetByUserIdAsync(user.UserId, cancellationToken);
+                teacherDto = teacher?.ToDto();
+            }
+            else if (user.Role == "Student")
+            {
+                var classes = await _classStudentRepo.GetClassesForStudentAsync(user.UserId, cancellationToken);
+                studentDto = user.ToUserWithClassesDto(classes, _tokenService);
             }
 
-            // 5. Final combined response
+            // 3. Always return base UserDto (no classes)
+            var userDto = user.ToDto(_tokenService);
+
             return new LoginResponseDto
             {
                 User = userDto,
-                Teacher = teacherDto   // null for students
+                Teacher = teacherDto,
+                Student = studentDto
             };
         }
     }
 }
-

@@ -17,7 +17,7 @@ namespace Learnable.Application.Common.Dtos
         public Guid? TeacherId { get; set; }
         public string? Status { get; set; }
     }
-    public class ClassResponseDto
+    public class ClassResponseDto 
     {
         public Guid ClassId { get; set; }
         public string ClassName { get; set; } = string.Empty;

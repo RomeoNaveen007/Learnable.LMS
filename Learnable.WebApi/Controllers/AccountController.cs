@@ -3,7 +3,6 @@ using Learnable.Application.Common.Extensions;
 using Learnable.Application.Features.Account.Commands.RegisterTeacher;
 using Learnable.Application.Features.Account.Queries.LoginUser;
 using Learnable.Application.Features.Account.Commands.RegisterUser;
-using Learnable.Application.Features.Users.Queries.LoginUser;
 using Learnable.Application.Features.Verifications.Commands.SendOtp;
 using Learnable.Domain.Common.OTP;
 using Learnable.WebApi.Requests;
