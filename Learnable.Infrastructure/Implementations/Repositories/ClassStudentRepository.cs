@@ -41,5 +41,15 @@ namespace Learnable.Infrastructure.Implementations.Repositories
             return await _context.ClassStudents
                 .AnyAsync(cs => cs.ClassId == classId && cs.UserId == userId, ct);
         }
+
+        public async Task<List<Class>> GetClassesForStudentAsync(Guid userId, CancellationToken ct)
+        {
+            return await _context.ClassStudents
+                .Where(cs => cs.UserId == userId)
+                .Include(cs => cs.Class)
+                .Select(cs => cs.Class)
+                .ToListAsync(ct);
+        }
+
     }
 }
