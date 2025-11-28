@@ -92,7 +92,7 @@ namespace Learnable.Application.Features.Account.Commands.RegisterUser
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             // --- Auto-join General Class ---
-            var defaultClass = (await _classRepo.GetAllAsync())
+            var defaultClass = await _classRepo.Query()
                 .FirstOrDefault(c => c.ClassName == "General Class");
 
             if (defaultClass == null)
