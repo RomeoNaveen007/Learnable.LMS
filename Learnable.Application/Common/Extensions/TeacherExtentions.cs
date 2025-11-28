@@ -28,22 +28,22 @@ namespace Learnable.Application.Common.Extensions
                 Username = teacher.User?.Username,
                 Email = teacher.User?.Email ?? string.Empty,
 
-                // Classes
-                Classes = teacher.Classes.Select(c => new ClassDto
-                {
-                    ClassId = c.ClassId,
-                    ClassName = c.ClassName,
-                    ClassJoinName = c.ClassJoinName,
-                    Description = c.Description,
-                    CreatedAt = c.CreatedAt,
-                    Status = c.Status
-                }).ToList()
+                //// Classes
+                //Classes = teacher.Classes.Select(c => new ClassDto
+                //{
+                //    ClassId = c.ClassId,
+                //    ClassName = c.ClassName,
+                //    ClassJoinName = c.ClassJoinName,
+                //    Description = c.Description,
+                //    CreatedAt = c.CreatedAt,
+                //    Status = c.Status
+                //}).ToList()
             };
         }
 
         public static List<TeacherDto> ToDtoList(this IEnumerable<Teacher> teachers)
         {
-            return teachers.Select(t => t.ToDto()).ToList();
+            return [.. teachers.Select(t => t.ToDto())];
         }
     }
 }

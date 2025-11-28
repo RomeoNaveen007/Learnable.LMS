@@ -23,7 +23,7 @@ namespace Learnable.Application.Common.Dtos
         public string Email { get; set; } = null!;
 
         // Classes
-        public List<ClassDto> Classes { get; set; } = new();
+        public List<ClassDto> Classes { get; set; } = [];
 
     }
 
