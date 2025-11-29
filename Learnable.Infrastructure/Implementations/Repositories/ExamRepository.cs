@@ -14,9 +14,9 @@ namespace Learnable.Infrastructure.Implementations.Repositories
             _context = context;
         }
 
-       
+
         // 1. ADD EXAM + QUESTIONS
-       
+
         public async Task<Exam> AddExamAsync(Exam exam, List<ExamQuestion> questions)
         {
             exam.ExamId = Guid.NewGuid();
@@ -35,9 +35,9 @@ namespace Learnable.Infrastructure.Implementations.Repositories
             return exam;
         }
 
-      
+
         // 2. GET EXAM + QUESTIONS BY ID
-      
+
         public async Task<Exam?> GetExamByIdAsync(Guid examId)
         {
             return await _context.Exams
@@ -45,7 +45,7 @@ namespace Learnable.Infrastructure.Implementations.Repositories
                 .FirstOrDefaultAsync(e => e.ExamId == examId);
         }
 
- 
+
         // 3. DELETE EXAM + QUESTIONS BY ID
 
         public async Task<bool> DeleteExamAsync(Guid examId)
