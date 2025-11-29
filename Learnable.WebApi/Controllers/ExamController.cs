@@ -26,6 +26,7 @@ namespace Learnable.WebApi.Controllers
             return Ok(result);
         }
 
+        // http://localhost:5071/api/Exam/
         [HttpPut]
         public async Task<IActionResult> UpdateExam(UpdateExamCommand command)
         {
@@ -33,7 +34,7 @@ namespace Learnable.WebApi.Controllers
             return Ok(result);
         }
 
-
+        // http://localhost:5071/api/Exam/id
         [HttpGet("{id}")]
         public async Task<IActionResult> GetExamById(Guid id)
         {
@@ -41,6 +42,7 @@ namespace Learnable.WebApi.Controllers
             return Ok(result);
         }
 
+        // http://localhost:5071/api/Exam/id
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteExam(Guid id)
         {
@@ -52,3 +54,29 @@ namespace Learnable.WebApi.Controllers
     }
 }
 
+
+//Data Check pannu  
+//Create Exam
+
+//{
+//    "exam": {
+//        "repoId": "7f7d4b40-5d0f-4c8f-8f5c-9ae3ce129a21",
+//    "title": "Mid Term Science Exam",
+//    "description": "60 marks",
+//    "startDatetime": "2025-01-02T10:00:00",
+//    "endDatetime": "2025-01-02T11:00:00",
+//    "duration": 60,
+//    "questions": [
+//      {
+//            "question": "What is the speed of light?",
+//        "answers": [
+//          "3x10^8 m/s",
+//          "3x10^6 m/s",
+//          "3x10^5 m/s",
+//          "3x10^2 m/s"
+//        ],
+//        "correctAnswerIndex": 0
+//      }
+//    ]
+//  }
+//}
