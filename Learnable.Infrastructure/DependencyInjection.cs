@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Learnable.Application.Common.Behaviors;
 using Learnable.Application.Features.Account.Commands.RegisterTeacher;
-using Learnable.Application.Features.Users.Queries.LoginUser;
+using Learnable.Application.Features.Account.Queries.LoginUser;
 using Learnable.Application.Interfaces.Repositories;
 using Learnable.Application.Interfaces.Repositories.Generic;
 using Learnable.Application.Interfaces.Services;

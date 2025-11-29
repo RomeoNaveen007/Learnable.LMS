@@ -19,21 +19,22 @@ namespace Learnable.Application.Features.Account.Commands.RegisterUser
         IUnitOfWork unitOfWork,
         IPasswordService passwordService,
         ITokenService tokenService,
-        IEmailService emailService) : IRequestHandler<RegisterUserCommand, UserDto>
+        IEmailService emailService)
+        : IRequestHandler<RegisterUserCommand, UserDto>
     {
-        private readonly IUserRepository _userRepo = userRepo ?? throw new ArgumentNullException(nameof(userRepo));
-        private readonly IClassStudentRepository _classStudentRepo = classStudentRepo ?? throw new ArgumentNullException(nameof(classStudentRepo));
-        private readonly IUnitOfWork _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-        private readonly IPasswordService _passwordService = passwordService ?? throw new ArgumentNullException(nameof(passwordService));
-        private readonly ITokenService _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
-        private readonly IEmailService _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
-        private readonly IClassRepository _classRepo = classRepo ?? throw new ArgumentNullException(nameof(classRepo));
+        private readonly IUserRepository _userRepo = userRepo;
+        private readonly IClassStudentRepository _classStudentRepo = classStudentRepo;
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IPasswordService _passwordService = passwordService;
+        private readonly ITokenService _tokenService = tokenService;
+        private readonly IEmailService _emailService = emailService;
+        private readonly IClassRepository _classRepo = classRepo;
 
         public async Task<UserDto> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
         {
             var dto = request.Dto;
 
-            // --- OTP validation ---
+            // ---------------- OTP VALIDATION ----------------
             var otpRecord = await _userRepo.GetOtpByEmailAsync(dto.Email, cancellationToken)
                 ?? throw new Exception("OTP not generated. Please request OTP first.");
 
@@ -43,35 +44,39 @@ namespace Learnable.Application.Features.Account.Commands.RegisterUser
             if (otpRecord.OtpCode != request.OtpCode)
             {
                 otpRecord.Attempts++;
+
+                // Regenerate OTP after 3 wrong attempts
                 if (otpRecord.Attempts >= 3)
                 {
                     var newOtp = new Random().Next(1000, 9999).ToString();
                     otpRecord.OtpCode = newOtp;
                     otpRecord.Attempts = 0;
                     otpRecord.ExpiresAt = DateTime.UtcNow.AddMinutes(5);
+
                     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                     await _emailService.SendAsync(dto.Email,
-                        "New OTP Code (Retry)",
-                        $"<h2>Your new OTP code is: <b>{newOtp}</b></h2>",
+                        "New OTP Code Sent",
+                        $"<h2>Your new OTP is <b>{newOtp}</b></h2>",
                         cancellationToken);
 
-                    throw new Exception("OTP incorrect 3 times. New OTP has been sent.");
+                    throw new Exception("OTP incorrect 3 times. New OTP sent.");
                 }
+
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
                 throw new Exception($"Incorrect OTP. Attempt {otpRecord.Attempts} of 3.");
             }
 
             await _userRepo.DeleteOtpAsync(otpRecord, cancellationToken);
 
-            // --- Validate email & username ---
+            // ---------------- EMAIL + USERNAME VALIDATION ----------------
             if (await _userRepo.ExistsByEmailAsync(dto.Email, cancellationToken))
                 throw new Exception("Email already registered.");
 
             if (await _userRepo.ExistsByUsernameAsync(dto.Username, cancellationToken))
                 throw new Exception("Username already taken.");
 
-            // --- Create user ---
+            // ---------------- CREATE USER ----------------
             _passwordService.CreatePasswordHash(dto.Password, out string hash, out string salt);
 
             var user = new Learnable.Domain.Entities.User
@@ -92,8 +97,7 @@ namespace Learnable.Application.Features.Account.Commands.RegisterUser
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             // --- Auto-join General Class ---
-            var defaultClass = (await _classRepo.GetAllAsync())
-                .FirstOrDefault(c => c.ClassName == "General Class");
+            var defaultClass = (await _classRepo.GetAllAsync()).FirstOrDefault(c => c.ClassName == "General Class");
 
             if (defaultClass == null)
             {
@@ -101,35 +105,48 @@ namespace Learnable.Application.Features.Account.Commands.RegisterUser
                 {
                     ClassId = Guid.NewGuid(),
                     ClassName = "General Class",
+                    ClassJoinName = "GENERAL-001",
                     CreatedAt = DateTime.UtcNow,
-                    Status = "Active"
+                    Status = "Active",
+                    Description = "Default class for all new students."
                 };
+
                 await _classRepo.CreateAsync(defaultClass);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
             }
 
+            // Ensure classJoinName always exists
+            if (string.IsNullOrWhiteSpace(defaultClass.ClassJoinName))
+            {
+                defaultClass.ClassJoinName = "GENERAL-001";
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+            }
+
+            // ---------------- ADD STUDENT TO GENERAL CLASS ----------------
             if (!await _classStudentRepo.IsStudentInClassAsync(defaultClass.ClassId, user.UserId, cancellationToken))
             {
-                await _classStudentRepo.CreateAsync(new ClassStudent
+                var joinRecord = new ClassStudent
                 {
                     ClassId = defaultClass.ClassId,
                     UserId = user.UserId,
                     JoinDate = DateTime.UtcNow,
                     StudentStatus = "Active"
-                });
+                };
+
+                await _classStudentRepo.CreateAsync(joinRecord);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
             }
 
-            // ---------------- FETCH USER CLASSES ----------------  
+            // ---------------- FETCH CLASSES ----------------
             var classes = await _classStudentRepo.GetClassesForStudentAsync(user.UserId, cancellationToken);
 
-            // --- Send welcome mail ---
+            // ---------------- SEND WELCOME EMAIL ----------------
             await _emailService.SendAsync(user.Email,
                 "Registration Successful",
-                $"<h2>Welcome {user.Username}!</h2><p>Your account has been created successfully.</p>",
+                $"<h2>Welcome {user.Username}!</h2><p>Your account is now active.</p>",
                 cancellationToken);
 
-            // --- Return DTO ---
+            // ---------------- RETURN CLEAN USER DTO ----------------
             return user.ToUserWithClassesDto(classes, _tokenService);
         }
     }
