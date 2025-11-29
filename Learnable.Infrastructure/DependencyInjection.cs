@@ -66,6 +66,9 @@ namespace Learnable.Infrastructure
             // Class Repository
             services.AddScoped<IClassRepository, ClassRepository>();
 
+            // Exam Repository
+            services.AddScoped<IExamRepository,ExamRepository>();
+
             // Asset Repository
             services.AddScoped<IAssetReopsitory, AssetReopsitory>();
 
