@@ -12,7 +12,7 @@ namespace Learnable.Application.Interfaces.Services.External
 {
     public interface IExamAiApiService
     {
-        Task<List<ExamQuestionDto>> GenerateQuestions(List<OcrPdfDto> chunks);
+        Task<List<ExamQuestionDto>> GenerateQuestions(List<OcrPdfDto> chunks, int questionCount);
     }
 
 }
