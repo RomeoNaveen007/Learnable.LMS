@@ -21,14 +21,14 @@ namespace Learnable.Application.Common.Extensions
                 StartDatetime = exam.StartDatetime,
                 EndDatetime = exam.EndDatetime,
                 Duration = exam.Duration,
-                Questions = exam.Questions.Select(q => new ExamQuestionDto
+                Questions = exam.Questions?.Select(q => new ExamQuestionDto
                 {
                     QuestionId = q.QuestionId,
                     ExamId = exam.ExamId,
                     Question = q.Question,
                     Answers = q.Answers,
                     CorrectAnswerIndex = q.CorrectAnswerIndex
-                }).ToList()
+                }).ToList() ?? new List<ExamQuestionDto>()
             };
         }
     }

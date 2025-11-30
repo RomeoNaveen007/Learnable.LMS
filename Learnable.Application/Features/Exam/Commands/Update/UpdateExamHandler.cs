@@ -6,7 +6,7 @@ using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Learnable.Application.Features.Exam.Commands.Update
@@ -22,11 +22,7 @@ namespace Learnable.Application.Features.Exam.Commands.Update
 
         public async Task<ExamDto?> Handle(UpdateExamCommand request, CancellationToken cancellationToken)
         {
-
-            //var examentity = await _examRepository.GetExamByIdAsync()
-
-            //if (examentity == null)
-            //    return null;
+            // Create updated exam entity
             var updatedExam = new Learnable.Domain.Entities.Exam
             {
                 ExamId = request.Exam.ExamId,
@@ -38,14 +34,18 @@ namespace Learnable.Application.Features.Exam.Commands.Update
                 Duration = request.Exam.Duration
             };
 
+            // Map updated questions and assign ExamId + navigation property
             var updatedQuestions = request.Exam.Questions.Select(q => new ExamQuestion
             {
                 QuestionId = Guid.NewGuid(),
                 Question = q.Question,
                 Answers = q.Answers,
-                CorrectAnswerIndex = q.CorrectAnswerIndex
+                CorrectAnswerIndex = q.CorrectAnswerIndex,
+                ExamId = request.Exam.ExamId,
+                Exam = updatedExam // Important
             }).ToList();
 
+            // Call repository to update
             var result = await _examRepository.UpdateExamAsync(updatedExam, updatedQuestions);
 
             return result?.ToDto();
