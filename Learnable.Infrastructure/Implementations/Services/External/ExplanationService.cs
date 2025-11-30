@@ -30,12 +30,13 @@ namespace Learnable.Infrastructure.Implementations.Services.External
                 throw new System.Exception("Text cannot be empty.");
 
             string prompt =
-                "<TASK> Explain this text in simple bullet points. No intro. No summary. </TASK>" +
-                "<INPUT>" + dto.text + "</INPUT>";
+                         "<TASK> Explain this text in exactly 10 bullet points. Each bullet point should be around 50 words. Do not include introduction or summary. Write clearly and concisely.</TASK>" +
+                         "<INPUT>" + dto.text + "</INPUT>";
+
 
             var body = new
             {
-                contents = new[]
+                contents = new[]                                                        
                 {
                     new { parts = new[] { new { text = prompt } } }
                 }
@@ -52,7 +53,7 @@ namespace Learnable.Infrastructure.Implementations.Services.External
 
             using var doc = JsonDocument.Parse(result);
 
-            string text = doc.RootElement
+            string? text = doc.RootElement
                 .GetProperty("candidates")[0]
                 .GetProperty("content")
                 .GetProperty("parts")[0]
@@ -64,6 +65,7 @@ namespace Learnable.Infrastructure.Implementations.Services.External
                             .Select(x => x.Trim('-', '•', ' '))
                             .ToList();
 
+           
             return lines;
         }
     }

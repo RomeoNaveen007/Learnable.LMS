@@ -1,4 +1,5 @@
 ﻿using Learnable.Application.Common.Dtos;
+using Learnable.Application.Features.AiServises.Queries.Explanation;
 using Learnable.Application.Features.Asset.Commands.AddAsset;
 using Learnable.Application.Features.Asset.Queries.GetAssetByID_;
 using MediatR;
@@ -59,6 +60,26 @@ namespace Learnable.WebApi.Controllers
             if (!success) return NotFound();
 
             return NoContent();
+        }
+
+
+
+
+        [HttpPost("explain-text")]
+        public async Task<ActionResult<List<string>>> ExplainText([FromBody] ExplainDto dto)
+        {
+            if (dto == null || string.IsNullOrWhiteSpace(dto.text))
+                return BadRequest("Text cannot be empty.");
+
+            // Mediator query create pannitu send pannrom
+            var query = new ExplanationQuerie
+            {
+                Input = dto
+            };
+
+            var result = await _mediator.Send(query);
+
+            return Ok(result);
         }
     }
 }
