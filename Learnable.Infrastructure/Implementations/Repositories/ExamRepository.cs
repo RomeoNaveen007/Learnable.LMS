@@ -1,4 +1,5 @@
 ﻿using Learnable.Application.Interfaces.Repositories;
+using Learnable.Application.Interfaces.Repositories.Generic;
 using Learnable.Domain.Entities;
 using Learnable.Infrastructure.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
@@ -8,15 +9,16 @@ namespace Learnable.Infrastructure.Implementations.Repositories
     public class ExamRepository : IExamRepository
     {
         private readonly ApplicationDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ExamRepository(ApplicationDbContext context)
+        public ExamRepository(ApplicationDbContext context, IUnitOfWork unitOfWork)
         {
             _context = context;
+            _unitOfWork = unitOfWork;
         }
 
 
         // 1. ADD EXAM + QUESTIONS
-
         public async Task<Exam> AddExamAsync(Exam exam, List<ExamQuestion> questions)
         {
             exam.ExamId = Guid.NewGuid();
@@ -25,15 +27,17 @@ namespace Learnable.Infrastructure.Implementations.Repositories
             {
                 q.QuestionId = Guid.NewGuid();
                 q.ExamId = exam.ExamId;
+                q.Exam = exam; // Important
             }
 
             exam.Questions = questions;
 
             _context.Exams.Add(exam);
-            await _context.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             return exam;
         }
+
 
 
         // 2. GET EXAM + QUESTIONS BY ID
@@ -57,7 +61,7 @@ namespace Learnable.Infrastructure.Implementations.Repositories
             if (exam == null) return false;
 
             _context.Exams.Remove(exam);
-            await _context.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             return true;
         }
@@ -82,19 +86,27 @@ namespace Learnable.Infrastructure.Implementations.Repositories
             existingExam.RepoId = updatedExam.RepoId;
 
             // Remove old questions
-            _context.ExamQuestions.RemoveRange(existingExam.Questions);
+            if (existingExam.Questions.Any())
+                _context.ExamQuestions.RemoveRange(existingExam.Questions);
 
-            // Add new questions
+            // Add new questions and assign navigation property
             foreach (var q in updatedQuestions)
             {
                 q.QuestionId = Guid.NewGuid();
                 q.ExamId = existingExam.ExamId;
+                q.Exam = existingExam; // Important
+                _context.ExamQuestions.Add(q); // Ensure EF Core tracks
             }
+
             existingExam.Questions = updatedQuestions;
 
-            await _context.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             return existingExam;
         }
+
     }
 }
+
+    
+    
