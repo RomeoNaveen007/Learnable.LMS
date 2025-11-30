@@ -8,6 +8,6 @@ namespace Learnable.Application.Common.Dtos
 {
     public class ExplainDto
     {
-        public string text { get; set; }
+        public string? text { get; set; }
     }
 }

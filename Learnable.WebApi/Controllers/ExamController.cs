@@ -1,4 +1,5 @@
-﻿using Learnable.Application.Features.Class.Commands.UpdateClass;
+﻿using Learnable.Application.Features.AiServises.Queries.Question.GetQuestions;
+using Learnable.Application.Features.Class.Commands.UpdateClass;
 using Learnable.Application.Features.Exam.Commands.Create;
 using Learnable.Application.Features.Exam.Commands.Delete;
 using Learnable.Application.Features.Exam.Commands.Update;
@@ -50,6 +51,23 @@ namespace Learnable.WebApi.Controllers
             return Ok(result);
         }
 
+
+
+        //get ai question 
+        // http://localhost:5071/api/Exam/get-questions
+        [HttpPost("get-questions")]
+        public async Task<IActionResult> GetQuestions([FromBody] GetQuestionQuery query)
+        {
+            if (query == null || query.Asset_Id == null || query.Asset_Id.Count == 0)
+                return BadRequest("Asset_Id list must not be empty.");
+
+            if (query.Question_Count <= 0)
+                return BadRequest("Question_Count must be greater than zero.");
+
+            var result = await _mediator.Send(query);
+
+            return Ok(result);
+        }
 
     }
 }

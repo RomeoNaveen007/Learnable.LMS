@@ -11,7 +11,7 @@ namespace Learnable.Application.Common.Dtos
     {
         public Guid QuestionId { get; set; }
         public Guid ExamId { get; set; }
-        public string Question { get; set; }
+        public string? Question { get; set; }
         public List<string> Answers { get; set; } = new List<string>();
         public int CorrectAnswerIndex { get; set; }
 

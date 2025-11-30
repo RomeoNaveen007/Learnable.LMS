@@ -25,13 +25,14 @@ namespace Learnable.Infrastructure.Implementations.Services.External
             _apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
         }
 
-        public async Task<List<ExamQuestionDto>> GenerateQuestions(List<OcrPdfDto> chunks)
+        public async Task<List<ExamQuestionDto>> GenerateQuestions(List<OcrPdfDto> chunks , int questionCount)
         {
-            if (chunks == null || chunks.Count == 0)
+            if (chunks == null || chunks.Count == 0 || questionCount==0)
                 throw new Exception("Chunk list cannot be empty.");
+            
 
             string prompt =
-                "<TASK> Using these text fragments, generate 10 MCQ questions. </TASK>" +
+                "<TASK> Using these text fragments, generate "+ questionCount + " MCQ questions. </TASK>" +
                 "<FORMAT> $ question $ Answer1 $ Answer2 $ Answer3 $ Answer4 $ Answer5 $ correctIndex $ </FORMAT>" +
                 "<INPUT>";
 
