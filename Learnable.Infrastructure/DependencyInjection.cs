@@ -40,8 +40,27 @@ namespace Learnable.Infrastructure
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IPasswordService, PasswordService>();
 
+
+
+
+
+
             //apiservices
             services.AddScoped<IAiApiService, AiApiService>();
+
+            //explanation service
+            services.AddScoped<IExplanationService, ExplanationService>();
+
+            //exam ai service
+            services.AddScoped<IExamAiApiService, ExamAiApiService>();
+
+
+
+
+
+
+
+
 
             // Generic repository
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -66,6 +85,7 @@ namespace Learnable.Infrastructure
 
             // Teacher Repository
             services.AddScoped<ITeacherRepository, TeacherRepository>();
+
             // Class Repository
             services.AddScoped<IClassRepository, ClassRepository>();
 
