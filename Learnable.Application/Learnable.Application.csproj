@@ -19,7 +19,8 @@
 
   <ItemGroup>
     <Folder Include="Features\AiServises\Commands\" />
-    <Folder Include="Features\AiServises\Queries\Explanation\" />
+    <Folder Include="Features\Marks\Commands\" />
+    <Folder Include="Features\Marks\Queries\" />
     <Folder Include="Features\RequestNotification\Queries\" />
   </ItemGroup>
 

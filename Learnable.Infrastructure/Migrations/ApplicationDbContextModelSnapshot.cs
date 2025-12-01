@@ -454,6 +454,38 @@ namespace Learnable.Infrastructure.Migrations
                     b.ToTable("Student");
                 });
 
+            modelBuilder.Entity("Learnable.Domain.Entities.StudentsAnswer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("AnswerIndex")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ExamId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("ExamId", "StudentId");
+
+                    b.ToTable("StudentsAnswers");
+                });
+
             modelBuilder.Entity("Learnable.Domain.Entities.Teacher", b =>
                 {
                     b.Property<Guid>("ProfileId")
@@ -712,6 +744,25 @@ namespace Learnable.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Learnable.Domain.Entities.StudentsAnswer", b =>
+                {
+                    b.HasOne("Learnable.Domain.Entities.ExamQuestion", "Question")
+                        .WithMany()
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Learnable.Domain.Entities.Mark", "Mark")
+                        .WithMany("StudentsAnswers")
+                        .HasForeignKey("ExamId", "StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Mark");
+
+                    b.Navigation("Question");
+                });
+
             modelBuilder.Entity("Learnable.Domain.Entities.Teacher", b =>
                 {
                     b.HasOne("Learnable.Domain.Entities.User", "User")
@@ -742,6 +793,11 @@ namespace Learnable.Infrastructure.Migrations
                     b.Navigation("Marks");
 
                     b.Navigation("Questions");
+                });
+
+            modelBuilder.Entity("Learnable.Domain.Entities.Mark", b =>
+                {
+                    b.Navigation("StudentsAnswers");
                 });
 
             modelBuilder.Entity("Learnable.Domain.Entities.Repository", b =>

@@ -22,8 +22,9 @@ namespace Learnable.Infrastructure.Persistence.Data
         public virtual DbSet<Class> Classes { get; set; }
         public virtual DbSet<ClassStudent> ClassStudents { get; set; }
         public virtual DbSet<Exam> Exams { get; set; }
-        public virtual DbSet<ExamQuestion> ExamQuestions { get; set; } // <-- new
+        public virtual DbSet<ExamQuestion> ExamQuestions { get; set; }
         public virtual DbSet<Mark> Marks { get; set; }
+        public virtual DbSet<StudentsAnswer> StudentsAnswers { get; set; } 
         public virtual DbSet<Prompt> Prompts { get; set; }
         public virtual DbSet<Repository> Repositories { get; set; }
         public virtual DbSet<RequestNotification> RequestNotifications { get; set; }
@@ -132,7 +133,6 @@ namespace Learnable.Infrastructure.Persistence.Data
 
                 entity.Property(e => e.Question).IsRequired();
 
-                // JSON conversion with explicit options
                 entity.Property(e => e.Answers)
                       .HasConversion(
                           v => System.Text.Json.JsonSerializer.Serialize(v, jsonOptions),
@@ -159,6 +159,25 @@ namespace Learnable.Infrastructure.Persistence.Data
                 entity.HasOne(d => d.Student)
                       .WithMany(p => p.Marks)
                       .OnDelete(DeleteBehavior.ClientSetNull);
+            });
+
+            // -------------------- StudentsAnswer --------------------
+            modelBuilder.Entity<StudentsAnswer>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.HasOne(e => e.Mark)
+                      .WithMany(m => m.StudentsAnswers)
+                      .HasForeignKey(e => new { e.ExamId, e.StudentId })
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.Question)
+                      .WithMany()
+                      .HasForeignKey(e => e.QuestionId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Property(e => e.SubmittedAt)
+                      .HasDefaultValueSql("(getdate())");
             });
 
             // -------------------- Prompt --------------------
