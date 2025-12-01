@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Learnable.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class First : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -370,6 +370,34 @@ namespace Learnable.Infrastructure.Migrations
                         principalColumn: "StudentId");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "StudentsAnswers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ExamId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StudentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    QuestionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AnswerIndex = table.Column<int>(type: "int", nullable: false),
+                    SubmittedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "(getdate())")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudentsAnswers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StudentsAnswers_ExamQuestion_QuestionId",
+                        column: x => x.QuestionId,
+                        principalTable: "ExamQuestion",
+                        principalColumn: "QuestionId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_StudentsAnswers_Marks_ExamId_StudentId",
+                        columns: x => new { x.ExamId, x.StudentId },
+                        principalTable: "Marks",
+                        principalColumns: new[] { "ExamId", "StudentId" },
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Assets_RepoId",
                 table: "Assets",
@@ -449,6 +477,16 @@ namespace Learnable.Infrastructure.Migrations
                 filter: "[UserId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_StudentsAnswers_ExamId_StudentId",
+                table: "StudentsAnswers",
+                columns: new[] { "ExamId", "StudentId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudentsAnswers_QuestionId",
+                table: "StudentsAnswers",
+                column: "QuestionId");
+
+            migrationBuilder.CreateIndex(
                 name: "UQ__Teacher__1788CC4DFD7991BE",
                 table: "Teacher",
                 column: "UserId",
@@ -486,12 +524,6 @@ namespace Learnable.Infrastructure.Migrations
                 name: "ClassStudent");
 
             migrationBuilder.DropTable(
-                name: "ExamQuestion");
-
-            migrationBuilder.DropTable(
-                name: "Marks");
-
-            migrationBuilder.DropTable(
                 name: "OcrPdf");
 
             migrationBuilder.DropTable(
@@ -504,16 +536,25 @@ namespace Learnable.Infrastructure.Migrations
                 name: "SmtpSetting");
 
             migrationBuilder.DropTable(
+                name: "StudentsAnswers");
+
+            migrationBuilder.DropTable(
                 name: "UserOtp");
+
+            migrationBuilder.DropTable(
+                name: "Assets");
+
+            migrationBuilder.DropTable(
+                name: "ExamQuestion");
+
+            migrationBuilder.DropTable(
+                name: "Marks");
 
             migrationBuilder.DropTable(
                 name: "Exam");
 
             migrationBuilder.DropTable(
                 name: "Student");
-
-            migrationBuilder.DropTable(
-                name: "Assets");
 
             migrationBuilder.DropTable(
                 name: "Repository");

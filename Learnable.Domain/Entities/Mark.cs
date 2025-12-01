@@ -27,4 +27,8 @@ public partial class Mark
     [ForeignKey("StudentId")]
     [InverseProperty("Marks")]
     public virtual Student Student { get; set; } = null!;
+
+    // 🔥 Add this navigation
+    [InverseProperty("Mark")]
+    public virtual ICollection<StudentsAnswer> StudentsAnswers { get; set; } = new List<StudentsAnswer>();
 }

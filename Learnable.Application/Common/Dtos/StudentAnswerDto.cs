@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace Learnable.Application.Common.Dtos
 {
-    public class ExplainDto
+    internal class StudentAnswerDto
     {
-        public string? text { get; set; }
+        public Guid QuestionId { get; set; }
+        public int AnswerIndex { get; set; }
+        public DateTime SubmittedAt { get; set; }
     }
 }

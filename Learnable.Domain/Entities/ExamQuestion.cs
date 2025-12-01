@@ -14,18 +14,15 @@ namespace Learnable.Domain.Entities
         [Key]
         public Guid QuestionId { get; set; }
 
-        // Foreign key to Exam
         public Guid ExamId { get; set; }
 
         [Required]
-        public string Question { get; set; } 
+        public string Question { get; set; } = string.Empty;
 
-        // Stored as JSON or separate table depending on your choice
         [NotMapped]
         public List<string> Answers { get; set; } = new List<string>();
 
         public int CorrectAnswerIndex { get; set; }
-
 
         [ForeignKey("ExamId")]
         [InverseProperty("Questions")]
