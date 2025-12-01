@@ -14,11 +14,13 @@ namespace Learnable.Application.Features.User.Queries.GetUserById
     public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery,UserDto?>
     {
         private readonly IUserRepository _userRepository;
+        private readonly IClassStudentRepository _classStudentRepo;
         private readonly ITokenService _tokenService;
 
-        public GetUserByIdQueryHandler(IUserRepository userRepository, ITokenService tokenService)
+        public GetUserByIdQueryHandler(IUserRepository userRepository,IClassStudentRepository classStudentRepo, ITokenService tokenService)
         {
             _userRepository = userRepository;
+            _classStudentRepo = classStudentRepo;
             _tokenService = tokenService;
         }
         public async Task<UserDto?> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
@@ -27,7 +29,11 @@ namespace Learnable.Application.Features.User.Queries.GetUserById
             if (user == null)
                 return null;
 
-            return user.ToDto(_tokenService);
+            var classes = await _classStudentRepo.GetClassesForStudentAsync(user.UserId, cancellationToken);
+
+            if (!classes.Any()) return null;
+
+            return user.ToUserWithClassesDto(classes, _tokenService);
         }
 
     }
