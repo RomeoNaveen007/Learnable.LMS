@@ -61,6 +61,7 @@ namespace Learnable.Infrastructure
 
 
 
+            
 
             // Generic repository
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -91,6 +92,9 @@ namespace Learnable.Infrastructure
 
             // Exam Repository
             services.AddScoped<IExamRepository,ExamRepository>();
+
+            //marks repo 
+            services.AddScoped<IMarksRepostiory, MarksRepository>();
 
             // Asset Repository
             services.AddScoped<IAssetReopsitory, AssetReopsitory>();
