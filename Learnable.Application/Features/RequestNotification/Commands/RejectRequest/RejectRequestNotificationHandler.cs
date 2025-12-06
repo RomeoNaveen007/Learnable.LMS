@@ -25,20 +25,24 @@ namespace Learnable.Application.Features.RequestNotification.Commands.RejectRequ
         public async Task<bool> Handle(RejectRequestNotificationCommand request, CancellationToken cancellationToken)
         {
             var notification = await _requestRepo.GetByIdAsync(n =>
-                n.SenderId == request.SenderId &&
-                n.ReceiverId == request.ReceiverId &&
-                n.ClassId == request.ClassId
+                n.NotificationId == request.RequestDto.NotificationId 
             );
 
-            if (notification == null) return false;
+            if (notification == null)
+            {
+
+                return false;
+            }
 
             notification.NotificationStatus = "Rejected";
 
-            // DB commit using UnitOfWork
+         
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return true;
         }
+  
+
     }
 
 }

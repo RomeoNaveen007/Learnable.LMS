@@ -40,6 +40,7 @@ namespace Learnable.Infrastructure.Implementations.Repositories
         public async Task<Teacher?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken)
         {
             return await context.Teachers
+                .Include(t => t.Classes)
                 .FirstOrDefaultAsync(t => t.UserId == userId, cancellationToken);
         }
 

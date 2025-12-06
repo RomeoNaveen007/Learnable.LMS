@@ -16,43 +16,34 @@ namespace Learnable.Infrastructure.Implementations.Repositories
         {
             _context = context;
         }
-
-        // =====================================================
-        // ⭐ Get Asset Details with OCR PDF list
-        // =====================================================
+        
         public async Task<Asset?> GetAssetWithOcrAsync(Guid assetId)
         {
             return await _context.Assets
-                .Include(a => a.OcrPdfs)   // Load OCR Chunks
+                .Include(a => a.OcrPdfs)  
                 .FirstOrDefaultAsync(a => a.AssetsProfileId == assetId);
         }
 
-        // =====================================================
-        // ⭐ Add Asset with OCR PDF list
-        // =====================================================
+
         public async Task<Asset> AddAssetWithOcrAsync(Asset asset)
         {
 
-            // Add Asset (cascades OcrPdf because of relationship)
             await _context.Assets.AddAsync(asset);
 
-            // Save changes
             await _context.SaveChangesAsync();
 
             return asset;
         }
 
+
         public async Task<bool> DeleteAssetWithOcrAsync(Guid assetId)
         {
-            // Find asset including OCR chunks
             var asset = await _context.Assets
                 .Include(a => a.OcrPdfs)
                 .FirstOrDefaultAsync(a => a.AssetsProfileId == assetId);
 
             if (asset == null)
-                return false; // Asset not found
-
-            // Remove asset (OcrPdfs will be deleted because of Cascade delete)
+                return false; 
             _context.Assets.Remove(asset);
 
             await _context.SaveChangesAsync();
