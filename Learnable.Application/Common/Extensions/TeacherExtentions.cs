@@ -29,15 +29,15 @@ namespace Learnable.Application.Common.Extensions
                 Email = teacher.User?.Email ?? string.Empty,
 
                 //// Classes
-                //Classes = teacher.Classes.Select(c => new ClassDto
-                //{
-                //    ClassId = c.ClassId,
-                //    ClassName = c.ClassName,
-                //    ClassJoinName = c.ClassJoinName,
-                //    Description = c.Description,
-                //    CreatedAt = c.CreatedAt,
-                //    Status = c.Status
-                //}).ToList()
+                Classes = teacher.Classes.Select(c => new ClassDto
+                {
+                    ClassId = c.ClassId,
+                    ClassName = c.ClassName,
+                    ClassJoinName = c.ClassJoinName,
+                    Description = c.Description,
+                    CreatedAt = c.CreatedAt,
+                    Status = c.Status
+                }).ToList()
             };
         }
 

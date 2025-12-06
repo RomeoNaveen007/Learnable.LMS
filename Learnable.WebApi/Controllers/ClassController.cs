@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Learnable.WebApi.Controllers
 {
+    [Authorize]
     public class ClassController : BaseController
     {
         private readonly IMediator _mediator;

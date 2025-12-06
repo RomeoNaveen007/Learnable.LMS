@@ -45,6 +45,7 @@ namespace Learnable.Infrastructure.Implementations.Repositories
         public async Task<User?> GetUserByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             return await _context.Users.SingleOrDefaultAsync(x => x.UserId == id, cancellationToken);
+
         }
 
     }

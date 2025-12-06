@@ -1,5 +1,4 @@
-﻿using MediatR;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Learnable.Application.Features.RequestNotification.Commands.RejectRequest
 {
-    public class RejectRequestNotificationCommand : IRequest<bool>
+    public class RejectRequestDto
     {
-        public RejectRequestDto RequestDto { get; set; } = null!;
+        public Guid NotificationId { get; set; }
     }
-
 }
