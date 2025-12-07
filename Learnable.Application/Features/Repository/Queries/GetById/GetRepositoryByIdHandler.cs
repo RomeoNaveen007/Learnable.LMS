@@ -26,6 +26,7 @@ namespace Learnable.Application.Features.Repository.Queries.GetById
             return new RepositoryDtos
             {
                 ClassId = repository.ClassId,
+                RepoId=repository.RepoId,
                 RepoName = repository.RepoName ?? string.Empty,
                 RepoDescription = repository.RepoDescription ?? string.Empty,
                 RepoCertification = repository.RepoCertification ?? string.Empty,
