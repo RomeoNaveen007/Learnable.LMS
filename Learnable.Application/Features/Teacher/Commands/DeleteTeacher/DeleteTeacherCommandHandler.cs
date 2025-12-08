@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Learnable.Application.Features.Teacher.Commands.DeleteTeacher
 {
-    public class DeleteTeacherCommandHandler : IRequestHandler<DeleteTeacherCommand, bool>
+    public class DeleteTeacherCommandHandler : IRequestHandler<DeleteTeacherByUserIdCommand, bool>
     {
         private readonly ITeacherRepository _teacherRepository;
         private readonly IUserRepository _userRepository;
@@ -24,23 +24,21 @@ namespace Learnable.Application.Features.Teacher.Commands.DeleteTeacher
             _userRepository = userRepository;
             _unitOfWork = unitOfWork;
         }
-        public async Task<bool> Handle(DeleteTeacherCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteTeacherByUserIdCommand request, CancellationToken cancellationToken)
         {
-            // Get teacher with user reference
-            var teacher = await _teacherRepository.GetTeacherWithUserAndClassesAsync(request.ProfileId, cancellationToken);
-
+            // Get the teacher by UserId
+            var teacher = await _teacherRepository.DeleteTeacherByUserIdAsync(request.UserId, cancellationToken);
             if (teacher == null)
                 return false;
 
-            // Delete the associated User first (if exclusive)
+            // Update the User role to "Student"
             if (teacher.User != null)
             {
-                await _userRepository.DeleteAsync(teacher.User);
+                teacher.User.Role = "Student"; // Assuming Role is a string
+                await _userRepository.UpdateAsync(teacher.User);
             }
 
-            // Delete the Teacher
-            await _teacherRepository.DeleteAsync(teacher);
-
+            // Delete Teacher entity
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return true;

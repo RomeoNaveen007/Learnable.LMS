@@ -12,14 +12,9 @@ using System.Threading.Tasks;
 
 namespace Learnable.Infrastructure.Implementations.Repositories
 {
-    public class TeacherRepository : GenericRepository<Teacher>, ITeacherRepository
+    public class TeacherRepository(ApplicationDbContext context) : GenericRepository<Teacher>(context), ITeacherRepository
     {
-        private readonly ApplicationDbContext context;
-
-        public TeacherRepository(ApplicationDbContext context) : base(context)
-        {
-            this.context = context;
-        }
+        private readonly ApplicationDbContext context = context;
 
         public async Task<Teacher?> GetTeacherWithUserAndClassesAsync(Guid profileId, CancellationToken cancellationToken)
         {
@@ -42,6 +37,21 @@ namespace Learnable.Infrastructure.Implementations.Repositories
             return await context.Teachers
                 .Include(t => t.Classes)
                 .FirstOrDefaultAsync(t => t.UserId == userId, cancellationToken);
+        }
+
+        public async Task<Teacher?> DeleteTeacherByUserIdAsync(Guid userId, CancellationToken cancellationToken)
+        {
+            var teacher = await context.Teachers
+                .Include(t => t.User)
+                .Include(t => t.Classes)
+                .FirstOrDefaultAsync(t => t.UserId == userId, cancellationToken);
+
+            if (teacher == null)
+                return null;
+
+            context.Teachers.Remove(teacher);
+
+            return teacher;
         }
 
     }
