@@ -32,16 +32,17 @@ namespace Learnable.WebApi.Controllers
         }
 
 
-        [HttpDelete("{profileId:guid}")]  // http://localhost:5071/api/teacher/
-        public async Task<ActionResult> DeleteTeacher(Guid profileId)
+        [HttpDelete("{UserId:guid}")]  // http://localhost:5071/api/teacher/
+        public async Task<ActionResult> DeleteTeacher(Guid userId)
         {
-            var result = await _mediator.Send(new DeleteTeacherCommand(profileId));
+            var result = await _mediator.Send(new DeleteTeacherByUserIdCommand(userId));
 
             if (!result)
                 return NotFound("Teacher not found");
 
             return Ok(new { message = "Teacher deleted successfully" });
         }
+
         [HttpGet("all")]  // http://localhost:5071/api/teacher/all
         public async Task<IActionResult> GetAll()
         {
