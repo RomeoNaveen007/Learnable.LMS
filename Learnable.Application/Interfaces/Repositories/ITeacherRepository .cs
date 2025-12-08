@@ -13,6 +13,7 @@ namespace Learnable.Application.Interfaces.Repositories
         Task<Teacher?> GetTeacherWithUserAndClassesAsync(Guid profileId, CancellationToken cancellationToken);
         Task<List<Teacher>> GetAllTeachersWithUserAndClassesAsync();
         Task<Teacher?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken);
+        Task<Teacher?> DeleteTeacherByUserIdAsync(Guid userId, CancellationToken cancellationToken);
 
     }
 }

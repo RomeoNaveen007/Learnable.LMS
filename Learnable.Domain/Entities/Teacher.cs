@@ -29,7 +29,7 @@ public partial class Teacher
     public DateTime? LastUpdatedAt { get; set; }
 
     [InverseProperty("Teacher")]
-    public virtual ICollection<Class> Classes { get; set; } = new List<Class>();
+    public virtual ICollection<Class> Classes { get; set; } = [];
 
     [ForeignKey("UserId")]
     [InverseProperty("Teacher")]
