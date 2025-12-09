@@ -1,18 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Learnable.Application.Features.Account.Commands.RegisterTeacher
 {
     public class RegisterTeacherDto
     {
-        // User fields
         public Guid UserId { get; set; }
-        public string Email { get; set; } = null!;
-        public string Username { get; set; } = null!;
-        public string Password { get; set; } = null!;
+
+        // Optional user update fields
         public string? DisplayName { get; set; }
         public string? FullName { get; set; }
 

@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 
 namespace Learnable.Application.Features.Teacher.Commands.DeleteTeacher
 {
-    public class DeleteTeacherCommand(Guid profileId) : IRequest<bool>
-    {
-        public Guid ProfileId { get; set; } = profileId;
-    }
+    public record DeleteTeacherByUserIdCommand(Guid UserId) : IRequest<bool>;
+
 }

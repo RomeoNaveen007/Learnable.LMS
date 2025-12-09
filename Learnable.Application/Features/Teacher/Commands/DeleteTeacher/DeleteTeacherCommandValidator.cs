@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Learnable.Application.Features.Teacher.Commands.DeleteTeacher
 {
-    public class DeleteTeacherCommandValidator : AbstractValidator<DeleteTeacherCommand>
+    public class DeleteTeacherCommandValidator : AbstractValidator<DeleteTeacherByUserIdCommand>
     {
         public DeleteTeacherCommandValidator()
         {
-            RuleFor(x => x.ProfileId)
+            RuleFor(x => x.UserId)
                 .NotEmpty()
                 .WithMessage("ProfileId is required.");
         }

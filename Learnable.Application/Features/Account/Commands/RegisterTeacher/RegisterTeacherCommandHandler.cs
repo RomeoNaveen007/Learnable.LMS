@@ -5,11 +5,6 @@ using Learnable.Application.Interfaces.Repositories.Generic;
 using Learnable.Application.Interfaces.Services;
 using Learnable.Domain.Entities;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Learnable.Application.Features.Account.Commands.RegisterTeacher
 {
@@ -39,36 +34,24 @@ namespace Learnable.Application.Features.Account.Commands.RegisterTeacher
         {
             var dto = request.Dto;
 
-            // 1. Check OTP
-            var otp = await _userRepo.GetOtpByEmailAsync(dto.Email, cancellationToken);
-            if (otp == null)
-                throw new Exception("OTP not found. Request a new OTP.");
-
-            if (otp.ExpiresAt < DateTime.UtcNow)
-                throw new Exception("OTP expired.");
-
-            if (otp.OtpCode != request.OtpCode)
-                throw new Exception("Invalid OTP.");
-
-            await _userRepo.DeleteOtpAsync(otp, cancellationToken);
-
-            // 2. Load existing user
+            // 1. Load existing user
             var user = await _userRepo.GetUserByIdAsync(dto.UserId, cancellationToken);
             if (user == null)
                 throw new Exception("User does not exist.");
 
-            // 3. Check if teacher already exists
+            // 2. Ensure teacher profile does not already exist
             var existingTeacher = await _teacherRepo.GetByUserIdAsync(dto.UserId, cancellationToken);
             if (existingTeacher != null)
                 throw new Exception("Teacher profile already exists.");
 
-            // 4. Convert user into teacher
+            // 3. Update user fields
             user.Role = "Teacher";
             user.FullName = dto.FullName ?? user.FullName;
             user.DisplayName = dto.DisplayName ?? user.DisplayName;
+
             await _userRepo.UpdateAsync(user);
 
-            // 5. Create Teacher record
+            // 4. Create the Teacher profile
             var teacher = new Learnable.Domain.Entities.Teacher
             {
                 ProfileId = Guid.NewGuid(),
@@ -81,9 +64,9 @@ namespace Learnable.Application.Features.Account.Commands.RegisterTeacher
             };
 
             await _teacherRepo.CreateAsync(teacher);
-
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+            // 5. Return the combined DTO
             return new TeacherUserDto
             {
                 User = user.ToDto(_tokenService),

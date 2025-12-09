@@ -58,7 +58,9 @@ namespace Learnable.Application.Features.Class.Queries
                     .Select(r => new RepositoryDto
                     {
                         RepositoryId = (Guid)r.RepoId,
-                        FileName = r.RepoName ?? string.Empty
+                        FileName = r.RepoName ?? string.Empty,
+                        RepoCertification=r.RepoCertification ?? string.Empty,
+                        RepoDescription=r.RepoDescription ?? string.Empty,
                     }).ToList() ?? new List<RepositoryDto>()
             };
         }

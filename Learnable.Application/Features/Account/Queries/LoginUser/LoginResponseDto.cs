@@ -12,6 +12,7 @@ namespace Learnable.Application.Features.Account.Queries.LoginUser
         public UserDto User { get; set; } = null!;
         public TeacherDto? Teacher { get; set; }
         public UserWithClassesDto? Student { get; set; } // Only for Students
+        public ClassDto? Class { get; set; }
 
     }
 }
