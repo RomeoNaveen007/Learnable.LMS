@@ -6,13 +6,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Learnable.Domain.Entities;
 
-[PrimaryKey("ExamId", "StudentId")]
 public partial class Mark
 {
+    // 🔥 NEW PRIMARY KEY
     [Key]
-    public Guid ExamId { get; set; }
+    public Guid MarkId { get; set; } = Guid.NewGuid();
 
-    [Key]
+    // 🔥 Foreign Keys
+    public Guid ExamId { get; set; }
     public Guid StudentId { get; set; }
 
     public int? Marks { get; set; }
@@ -20,15 +21,18 @@ public partial class Mark
     [StringLength(50)]
     public string? ExamStatus { get; set; }
 
+    // 🔥 Relationship → Exam
     [ForeignKey("ExamId")]
     [InverseProperty("Marks")]
     public virtual Exam Exam { get; set; } = null!;
 
+    // 🔥 Relationship → User (Student)
     [ForeignKey("StudentId")]
     [InverseProperty("Marks")]
-    public virtual Student Student { get; set; } = null!;
+    public virtual User User { get; set; } = null!;
 
-    // 🔥 Add this navigation
+    // 🔥 Relationship → StudentsAnswer
     [InverseProperty("Mark")]
-    public virtual ICollection<StudentsAnswer> StudentsAnswers { get; set; } = new List<StudentsAnswer>();
+    public virtual ICollection<StudentsAnswer> StudentsAnswers { get; set; }
+        = new List<StudentsAnswer>();
 }

@@ -92,24 +92,6 @@ namespace Learnable.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Student",
-                columns: table => new
-                {
-                    StudentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    EnrollmentDate = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "(getdate())")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Student", x => x.StudentId);
-                    table.ForeignKey(
-                        name: "FK_Student_User_UserId",
-                        column: x => x.UserId,
-                        principalTable: "User",
-                        principalColumn: "UserId");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Teacher",
                 columns: table => new
                 {
@@ -350,6 +332,7 @@ namespace Learnable.Infrastructure.Migrations
                 name: "Marks",
                 columns: table => new
                 {
+                    MarkId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ExamId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     StudentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Marks = table.Column<int>(type: "int", nullable: true),
@@ -357,17 +340,20 @@ namespace Learnable.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marks", x => new { x.ExamId, x.StudentId });
+                    table.PrimaryKey("PK_Marks", x => x.MarkId);
+                    table.UniqueConstraint("AK_Marks_ExamId_StudentId", x => new { x.ExamId, x.StudentId });
                     table.ForeignKey(
                         name: "FK_Marks_Exam_ExamId",
                         column: x => x.ExamId,
                         principalTable: "Exam",
-                        principalColumn: "ExamId");
+                        principalColumn: "ExamId",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Marks_Student_StudentId",
+                        name: "FK_Marks_User_StudentId",
                         column: x => x.StudentId,
-                        principalTable: "Student",
-                        principalColumn: "StudentId");
+                        principalTable: "User",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -388,8 +374,7 @@ namespace Learnable.Infrastructure.Migrations
                         name: "FK_StudentsAnswers_ExamQuestion_QuestionId",
                         column: x => x.QuestionId,
                         principalTable: "ExamQuestion",
-                        principalColumn: "QuestionId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "QuestionId");
                     table.ForeignKey(
                         name: "FK_StudentsAnswers_Marks_ExamId_StudentId",
                         columns: x => new { x.ExamId, x.StudentId },
@@ -470,13 +455,6 @@ namespace Learnable.Infrastructure.Migrations
                 column: "SenderId");
 
             migrationBuilder.CreateIndex(
-                name: "UQ__Student__1788CC4D4FFBBC12",
-                table: "Student",
-                column: "UserId",
-                unique: true,
-                filter: "[UserId] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_StudentsAnswers_ExamId_StudentId",
                 table: "StudentsAnswers",
                 columns: new[] { "ExamId", "StudentId" });
@@ -552,9 +530,6 @@ namespace Learnable.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Exam");
-
-            migrationBuilder.DropTable(
-                name: "Student");
 
             migrationBuilder.DropTable(
                 name: "Repository");

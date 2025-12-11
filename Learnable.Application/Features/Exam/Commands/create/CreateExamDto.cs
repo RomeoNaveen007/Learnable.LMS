@@ -8,7 +8,7 @@ namespace Learnable.Application.Features.Exam.Commands.Create
 {
     public class CreateExamDto
     {
-        public Guid? RepoId { get; set; }
+        public Guid RepoId { get; set; }
         public string Title { get; set; } = null!;
         public string? Description { get; set; }
         public DateTime? StartDatetime { get; set; }

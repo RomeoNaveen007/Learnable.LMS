@@ -16,7 +16,7 @@ namespace Learnable.Application.Interfaces.Repositories
         Task<List<Class>> GetClassesForStudentAsync(Guid userId, CancellationToken ct);
 
         Task<bool> IsStudentAlreadyJoinedAsync(Guid classId, Guid userId, CancellationToken ct);
-        Task<List<Guid>> GetStudentIdsByClassIdAsync(Guid classId, CancellationToken ct);
+        Task<List<Guid>> GetStudentIdsByClassIdAsync(Guid classId);
     }
 
 }

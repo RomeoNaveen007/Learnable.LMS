@@ -28,7 +28,7 @@ namespace Learnable.Application.Features.Marks.Commands.CreateMark
             CancellationToken ct)
         {
             // 1️⃣ Get student ids from class
-            var studentIds = await _classRepo.GetStudentIdsByClassIdAsync(request.ClassId, ct);
+            var studentIds = await _classRepo.GetStudentIdsByClassIdAsync(request.ClassId);
 
             // 2️⃣ For returning values (list of newly created studentIds)
             List<Guid> createdForStudents = new();

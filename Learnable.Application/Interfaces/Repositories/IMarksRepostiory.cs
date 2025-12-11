@@ -23,5 +23,6 @@ namespace Learnable.Application.Interfaces.Repositories
 
         // Delete a Mark and its related StudentsAnswers
         Task<bool> DeleteMarkAsync(Guid examId, Guid studentId);
+        Task<bool> DeleteMarksByExamIdAsync(Guid examId);
     }
 }
