@@ -42,10 +42,18 @@ namespace Learnable.Infrastructure.Implementations.Repositories
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
         }
+        
         public async Task<User?> GetUserByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            return await _context.Users.SingleOrDefaultAsync(x => x.UserId == id, cancellationToken);
+            return await _context.Users
+                // Teacher → Classes
+                .Include(u => u.Teacher)
+                    .ThenInclude(t => t.Classes)
+             .Include(u => u.ClassStudents)
+                        .ThenInclude(cs => cs.Class)
 
+        .FirstOrDefaultAsync(u => u.UserId == id, cancellationToken);
+            ;
         }
 
     }

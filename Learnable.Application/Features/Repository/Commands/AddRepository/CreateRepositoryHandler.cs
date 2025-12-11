@@ -1,4 +1,5 @@
 ﻿using Learnable.Application.Common.Dtos;
+using Learnable.Application.Common.Exceptions;
 using Learnable.Application.Common.Extensions;
 using Learnable.Application.Features.Class.Commands.AddClass;
 using Learnable.Application.Interfaces.Repositories.Generic;
@@ -26,6 +27,7 @@ namespace Learnable.Application.Features.Repository.Commands.AddRepository
 
         public async Task<RepositoryDtos> Handle(CreateRepositoryCommand request, CancellationToken cancellationToken)
         {
+
             var newRepository = new Learnable.Domain.Entities.Repository
             {
                 RepoId = Guid.NewGuid(),
