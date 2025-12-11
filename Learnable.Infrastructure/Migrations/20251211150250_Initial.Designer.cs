@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Learnable.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251209050507_Initial")]
+    [Migration("20251211150250_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -301,10 +301,10 @@ namespace Learnable.Infrastructure.Migrations
 
             modelBuilder.Entity("Learnable.Domain.Entities.Mark", b =>
                 {
-                    b.Property<Guid>("ExamId")
+                    b.Property<Guid>("MarkId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("StudentId")
+                    b.Property<Guid>("ExamId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ExamStatus")
@@ -314,7 +314,10 @@ namespace Learnable.Infrastructure.Migrations
                     b.Property<int?>("Marks")
                         .HasColumnType("int");
 
-                    b.HasKey("ExamId", "StudentId");
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("MarkId");
 
                     b.HasIndex("StudentId");
 
@@ -435,28 +438,6 @@ namespace Learnable.Infrastructure.Migrations
                     b.ToTable("RequestNotification");
                 });
 
-            modelBuilder.Entity("Learnable.Domain.Entities.Student", b =>
-                {
-                    b.Property<Guid>("StudentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("EnrollmentDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("(getdate())");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("StudentId");
-
-                    b.HasIndex(new[] { "UserId" }, "UQ__Student__1788CC4D4FFBBC12")
-                        .IsUnique()
-                        .HasFilter("[UserId] IS NOT NULL");
-
-                    b.ToTable("Student");
-                });
-
             modelBuilder.Entity("Learnable.Domain.Entities.StudentsAnswer", b =>
                 {
                     b.Property<Guid>("Id")
@@ -526,6 +507,7 @@ namespace Learnable.Infrastructure.Migrations
             modelBuilder.Entity("Learnable.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("UserId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("CreatedAt")
@@ -680,16 +662,18 @@ namespace Learnable.Infrastructure.Migrations
                     b.HasOne("Learnable.Domain.Entities.Exam", "Exam")
                         .WithMany("Marks")
                         .HasForeignKey("ExamId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Learnable.Domain.Entities.Student", "Student")
+                    b.HasOne("Learnable.Domain.Entities.User", "User")
                         .WithMany("Marks")
                         .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Exam");
 
-                    b.Navigation("Student");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Learnable.Domain.Entities.OcrPdf", b =>
@@ -738,26 +722,17 @@ namespace Learnable.Infrastructure.Migrations
                     b.Navigation("Sender");
                 });
 
-            modelBuilder.Entity("Learnable.Domain.Entities.Student", b =>
-                {
-                    b.HasOne("Learnable.Domain.Entities.User", "User")
-                        .WithOne("Student")
-                        .HasForeignKey("Learnable.Domain.Entities.Student", "UserId");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Learnable.Domain.Entities.StudentsAnswer", b =>
                 {
                     b.HasOne("Learnable.Domain.Entities.ExamQuestion", "Question")
                         .WithMany()
                         .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Learnable.Domain.Entities.Mark", "Mark")
                         .WithMany("StudentsAnswers")
                         .HasForeignKey("ExamId", "StudentId")
+                        .HasPrincipalKey("ExamId", "StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -810,11 +785,6 @@ namespace Learnable.Infrastructure.Migrations
                     b.Navigation("Exams");
                 });
 
-            modelBuilder.Entity("Learnable.Domain.Entities.Student", b =>
-                {
-                    b.Navigation("Marks");
-                });
-
             modelBuilder.Entity("Learnable.Domain.Entities.Teacher", b =>
                 {
                     b.Navigation("Classes");
@@ -826,11 +796,11 @@ namespace Learnable.Infrastructure.Migrations
 
                     b.Navigation("ClassStudents");
 
+                    b.Navigation("Marks");
+
                     b.Navigation("RequestNotificationReceivers");
 
                     b.Navigation("RequestNotificationSenders");
-
-                    b.Navigation("Student");
 
                     b.Navigation("Teacher");
                 });

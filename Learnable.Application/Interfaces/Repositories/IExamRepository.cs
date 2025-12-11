@@ -13,5 +13,6 @@ namespace Learnable.Application.Interfaces.Repositories
         Task<Exam?> GetExamByIdAsync(Guid examId);
         Task<bool> DeleteExamAsync(Guid examId);
         Task<Exam?> UpdateExamAsync(Exam updatedExam, List<ExamQuestion> updatedQuestions);
+        Task<Exam?> GetLastCreatedExamAsync();
     }
 }

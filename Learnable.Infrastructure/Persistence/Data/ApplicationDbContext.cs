@@ -15,7 +15,7 @@ namespace Learnable.Infrastructure.Persistence.Data
         { }
 
         // ============================================================
-        //                       DbSet Properties
+        //                        DbSet Properties
         // ============================================================
         public virtual DbSet<Asset> Assets { get; set; }
         public virtual DbSet<AuditLog> AuditLogs { get; set; }
@@ -24,11 +24,10 @@ namespace Learnable.Infrastructure.Persistence.Data
         public virtual DbSet<Exam> Exams { get; set; }
         public virtual DbSet<ExamQuestion> ExamQuestions { get; set; }
         public virtual DbSet<Mark> Marks { get; set; }
-        public virtual DbSet<StudentsAnswer> StudentsAnswers { get; set; } 
+        public virtual DbSet<StudentsAnswer> StudentsAnswers { get; set; }
         public virtual DbSet<Prompt> Prompts { get; set; }
         public virtual DbSet<Repository> Repositories { get; set; }
         public virtual DbSet<RequestNotification> RequestNotifications { get; set; }
-        public virtual DbSet<Student> Students { get; set; }
         public virtual DbSet<Teacher> Teachers { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserOtp> UserOtps { get; set; }
@@ -36,7 +35,7 @@ namespace Learnable.Infrastructure.Persistence.Data
         public virtual DbSet<ApiException> ApiExceptions { get; set; }
 
         // ============================================================
-        //                       Database Config
+        //                        Database Config
         // ============================================================
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             => optionsBuilder.UseSqlServer(
@@ -48,7 +47,7 @@ namespace Learnable.Infrastructure.Persistence.Data
             );
 
         // ============================================================
-        //                   Model Creating (Fluent API)
+        //                    Model Creating (Fluent API)
         // ============================================================
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -119,6 +118,7 @@ namespace Learnable.Infrastructure.Persistence.Data
                 entity.HasOne(d => d.Repo)
                       .WithMany(p => p.Exams);
 
+                // Exam delete -> Question delete (Cascade)
                 entity.HasMany(d => d.Questions)
                       .WithOne(q => q.Exam)
                       .HasForeignKey(q => q.ExamId)
@@ -147,18 +147,29 @@ namespace Learnable.Infrastructure.Persistence.Data
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
-            // -------------------- Mark --------------------
+            // -------------------- Mark (UPDATED) --------------------
             modelBuilder.Entity<Mark>(entity =>
             {
-                entity.HasKey(e => new { e.ExamId, e.StudentId });
+                // 🔥 NEW: Single Primary Key from the updated Entity
+                entity.HasKey(e => e.MarkId);
+                entity.Property(e => e.MarkId).ValueGeneratedNever();
 
+                // 🔥 NEW: Ensure uniqueness for Student+Exam and allow StudentsAnswer to link
+                // This creates a Unique Constraint on ExamId + StudentId
+                entity.HasAlternateKey(e => new { e.ExamId, e.StudentId });
+
+                // Relation to User (Student) -> User Delete = Mark Delete (Cascade)
+                entity.HasOne(d => d.User)
+                      .WithMany(p => p.Marks)
+                      .HasForeignKey(d => d.StudentId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // Relation to Exam -> Exam Delete = Prevent Delete if Marks exist (Restrict)
+                // Note: Can't use ClientSetNull because ExamId is non-nullable Guid.
                 entity.HasOne(d => d.Exam)
                       .WithMany(p => p.Marks)
-                      .OnDelete(DeleteBehavior.ClientSetNull);
-
-                entity.HasOne(d => d.Student)
-                      .WithMany(p => p.Marks)
-                      .OnDelete(DeleteBehavior.ClientSetNull);
+                      .HasForeignKey(d => d.ExamId)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
 
             // -------------------- StudentsAnswer --------------------
@@ -166,15 +177,20 @@ namespace Learnable.Infrastructure.Persistence.Data
             {
                 entity.HasKey(e => e.Id);
 
+                // Relation to Mark (UPDATED to use Principal Key)
+                // Links StudentsAnswer to Mark via ExamId + StudentId
                 entity.HasOne(e => e.Mark)
                       .WithMany(m => m.StudentsAnswers)
-                      .HasForeignKey(e => new { e.ExamId, e.StudentId })
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .HasForeignKey(e => new { e.ExamId, e.StudentId }) // FK in StudentsAnswer
+                      .HasPrincipalKey(m => new { m.ExamId, m.StudentId }) // Points to Alternate Key in Mark
+                      .OnDelete(DeleteBehavior.Cascade); // Mark Delete = Answer Delete
 
+                // Relation to Question
+                // Exam (Question) delete -> Answer stays (ClientSetNull)
                 entity.HasOne(e => e.Question)
                       .WithMany()
                       .HasForeignKey(e => e.QuestionId)
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.ClientSetNull);
 
                 entity.Property(e => e.SubmittedAt)
                       .HasDefaultValueSql("(getdate())");
@@ -223,17 +239,6 @@ namespace Learnable.Infrastructure.Persistence.Data
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
-            // -------------------- Student --------------------
-            modelBuilder.Entity<Student>(entity =>
-            {
-                entity.HasKey(e => e.StudentId);
-                entity.Property(e => e.StudentId).ValueGeneratedNever();
-                entity.Property(e => e.EnrollmentDate).HasDefaultValueSql("(getdate())");
-
-                entity.HasOne(d => d.User)
-                      .WithOne(p => p.Student);
-            });
-
             // -------------------- Teacher --------------------
             modelBuilder.Entity<Teacher>(entity =>
             {
@@ -248,7 +253,6 @@ namespace Learnable.Infrastructure.Persistence.Data
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.UserId);
-                entity.Property(e => e.UserId).ValueGeneratedNever();
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
                 entity.Property(e => e.IsActive).HasDefaultValue(true);
             });

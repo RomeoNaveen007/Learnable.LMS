@@ -88,17 +88,34 @@ namespace Learnable.Infrastructure.Implementations.Repositories
             return existingMark;
         }
 
-        // 5️⃣ Delete Mark and related StudentsAnswers
+        // 5️⃣ Delete Single Mark (ExamId + StudentId)
         public async Task<bool> DeleteMarkAsync(Guid examId, Guid studentId)
         {
             var mark = await _context.Marks
-                .Include(m => m.StudentsAnswers)
                 .SingleOrDefaultAsync(m => m.ExamId == examId && m.StudentId == studentId);
 
             if (mark == null) return false;
 
-            _context.StudentsAnswers.RemoveRange(mark.StudentsAnswers);
+            // Note: Cascade delete in DbContext will handle StudentsAnswers automatically, 
+            // but explicitly removing the mark is enough.
             _context.Marks.Remove(mark);
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // 6️⃣ 🔥 NEW: Delete All Marks by ExamId
+        public async Task<bool> DeleteMarksByExamIdAsync(Guid examId)
+        {
+            // அந்த ExamId-க்கு உரிய எல்லா Mark-களையும் எடுக்கிறோம்
+            var marks = await _context.Marks
+                .Where(m => m.ExamId == examId)
+                .ToListAsync();
+
+            if (!marks.Any()) return false; // அழிக்க எதுவும் இல்லை என்றால் false
+
+            // Mark-களை அழிக்கிறோம் (DbContext-ல் Cascade இருப்பதால் Answers-உம் தானாக அழியும்)
+            _context.Marks.RemoveRange(marks);
 
             await _context.SaveChangesAsync();
             return true;

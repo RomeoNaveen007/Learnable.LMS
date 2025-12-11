@@ -52,12 +52,12 @@ namespace Learnable.Infrastructure.Implementations.Repositories
         }
 
         //grt student id by class id
-        public async Task<List<Guid>> GetStudentIdsByClassIdAsync(Guid classId, CancellationToken ct)
+        public async Task<List<Guid>> GetStudentIdsByClassIdAsync(Guid classId)
         {
             return await _context.ClassStudents
                 .Where(cs => cs.ClassId == classId)
                 .Select(cs => cs.UserId)
-                .ToListAsync(ct);
+                .ToListAsync();
         }
 
     }
