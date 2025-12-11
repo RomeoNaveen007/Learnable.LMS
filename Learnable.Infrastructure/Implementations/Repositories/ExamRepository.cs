@@ -39,9 +39,7 @@ namespace Learnable.Infrastructure.Implementations.Repositories
         }
 
 
-
         // 2. GET EXAM + QUESTIONS BY ID
-
         public async Task<Exam?> GetExamByIdAsync(Guid examId)
         {
             return await _context.Exams
@@ -50,10 +48,10 @@ namespace Learnable.Infrastructure.Implementations.Repositories
         }
 
 
-        // 3. DELETE EXAM + QUESTIONS BY ID
-
+        // 3. DELETE EXAM + QUESTIONS + MARKS (Updated)
         public async Task<bool> DeleteExamAsync(Guid examId)
         {
+            // 🔥 UPDATE: Marks-ஐயும் சேர்த்து Include செய்கிறோம்
             var exam = await _context.Exams
                 .Include(e => e.Questions)
                 .FirstOrDefaultAsync(e => e.ExamId == examId);
@@ -61,6 +59,7 @@ namespace Learnable.Infrastructure.Implementations.Repositories
             if (exam == null) return false;
 
             _context.Exams.Remove(exam);
+
             await _unitOfWork.SaveChangesAsync();
 
             return true;
@@ -68,7 +67,6 @@ namespace Learnable.Infrastructure.Implementations.Repositories
 
 
         // 4. UPDATE EXAM + QUESTIONS
-
         public async Task<Exam?> UpdateExamAsync(Exam updatedExam, List<ExamQuestion> updatedQuestions)
         {
             var existingExam = await _context.Exams
@@ -105,8 +103,14 @@ namespace Learnable.Infrastructure.Implementations.Repositories
             return existingExam;
         }
 
+        // 5. GET LAST ADDED EXAM
+        public async Task<Exam?> GetLastCreatedExamAsync()
+        {
+            return await _context.Exams
+                .Include(e => e.Questions)
+                .OrderByDescending(e => e.StartDatetime)
+                .FirstOrDefaultAsync();
+        }
+
     }
 }
-
-    
-    

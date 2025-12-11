@@ -21,10 +21,7 @@ namespace Learnable.Domain.Entities
         public DateTime SubmittedAt { get; set; }
 
         // ---- Navigation Properties ----
-        [ForeignKey(nameof(ExamId) + "," + nameof(StudentId))]
         public virtual Mark Mark { get; set; } = null!;
-
-        [ForeignKey(nameof(QuestionId))]
         public virtual ExamQuestion Question { get; set; } = null!;
     }
 }
