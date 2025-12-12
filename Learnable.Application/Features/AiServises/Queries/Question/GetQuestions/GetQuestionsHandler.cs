@@ -1,4 +1,5 @@
 ﻿using Learnable.Application.Common.Dtos;
+using Learnable.Application.Common.Exceptions;
 using Learnable.Application.Features.AiServises.Queries.Question.GetQuestions;
 using Learnable.Application.Interfaces.Repositories;
 using Learnable.Application.Interfaces.Services.External;
@@ -26,10 +27,10 @@ namespace Learnable.Application.Features.AiServises.Queries.Question.GetQuestion
         public async Task<List<ExamQuestionDto>> Handle(GetQuestionQuery request, CancellationToken cancellationToken)
         {
             if (request.Asset_Id == null || request.Asset_Id.Count == 0)
-                throw new Exception("No Asset Ids provided.");
+                throw new BadRequestException("No Asset Ids provided.");
 
             if (request.Question_Count <= 0)
-                throw new Exception("Question Count must be greater than zero.");
+                throw new BadRequestException("Question Count must be greater than zero.");
 
             List<OcrPdfDto> allChunks = new();
 
@@ -53,7 +54,7 @@ namespace Learnable.Application.Features.AiServises.Queries.Question.GetQuestion
             }
 
             if (allChunks.Count == 0)
-                throw new Exception("No OCR data available for given asset IDs.");
+                throw new BadRequestException("No OCR data available for given asset IDs.");
 
             // Call AI generator
             var questions = await _aiService.GenerateQuestions(allChunks, request.Question_Count);

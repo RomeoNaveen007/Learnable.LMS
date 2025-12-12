@@ -1,4 +1,5 @@
 ﻿using Learnable.Application.Common.Dtos;
+using Learnable.Application.Common.Exceptions;
 using Learnable.Application.Common.Extensions;
 using Learnable.Application.Interfaces.Repositories;
 using Learnable.Domain.Entities;
@@ -22,6 +23,15 @@ namespace Learnable.Application.Features.Exam.Commands.Update
 
         public async Task<ExamDto?> Handle(UpdateExamCommand request, CancellationToken cancellationToken)
         {
+            // 1️⃣ check if exam already exists
+            var existingExam = await _examRepository.GetExamByIdAsync(request.Exam.ExamId);
+            if (existingExam == null)
+                throw new KeyNotFoundException("Exam not found.");
+
+            // 2️⃣ validate exam dates (extra business validation)
+            if (request.Exam.StartDatetime >= request.Exam.EndDatetime)
+                throw new BadRequestException("StartDatetime must be before EndDatetime.");
+
             // Create updated exam entity
             var updatedExam = new Learnable.Domain.Entities.Exam
             {
@@ -47,6 +57,9 @@ namespace Learnable.Application.Features.Exam.Commands.Update
 
             // Call repository to update
             var result = await _examRepository.UpdateExamAsync(updatedExam, updatedQuestions);
+
+            if (result == null)
+                throw new Exception("Exam update failed due to a server error.");
 
             return result?.ToDto();
         }

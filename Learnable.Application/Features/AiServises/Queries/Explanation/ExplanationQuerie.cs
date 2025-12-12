@@ -10,6 +10,6 @@ namespace Learnable.Application.Features.AiServises.Queries.Explanation
 {
     public class ExplanationQuerie : IRequest<List<string>>
     {
-        public ExplainDto Input { get; set; }
+        public ExplainDto? Input { get; set; }
     }
 }
