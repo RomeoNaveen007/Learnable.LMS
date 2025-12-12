@@ -13,7 +13,7 @@ namespace Learnable.Application.Features.Repository.Commands.AddRepository
     // Fix: Ensure CreateRepositoryCommand implements IRequest<RepositoryDtos>
     public class CreateRepositoryCommand : IRequest<RepositoryDtos>
     {
-        public CreateRepositoryDto CreateRepositoryDto { get; set; }
+        public CreateRepositoryDto? CreateRepositoryDto { get; set; }
     }
 }
 /*RepositoryDtos*/

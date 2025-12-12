@@ -1,12 +1,8 @@
-﻿using Learnable.Application.Interfaces.Repositories;
+﻿using Learnable.Application.Common.Exceptions;
+using Learnable.Application.Interfaces.Repositories;
 using Learnable.Application.Interfaces.Repositories.Generic;
 using Learnable.Domain.Entities;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Learnable.Application.Features.RequestNotification.Commands.Approve
 {
@@ -28,39 +24,47 @@ namespace Learnable.Application.Features.RequestNotification.Commands.Approve
 
         public async Task<ApproveRequestDto> Handle(ApproveRequestCommand request, CancellationToken cancellationToken)
         {
-            // 1️⃣ Get existing request
+            // 1️⃣ Validate NotificationId
+            if (request.RequestDto.NotificationId == Guid.Empty)
+                throw new BadRequestException("NotificationId is required.");
+
+            // 2️⃣ Get existing request
             var existing = await _requestRepository.GetByIdAsync(
                 x => x.NotificationId == request.RequestDto.NotificationId
             );
 
             if (existing == null)
-                throw new Exception("Request not found");
+                throw new KeyNotFoundException("Request not found."); // 404 handled by middleware
 
-            // 2️⃣ Approve the request
+            // 3️⃣ Approve the request
             existing.NotificationStatus = "Approved";
             await _requestRepository.UpdateAsync(existing);
 
-            // 3️⃣ Check if student already joined the class
-            var alreadyJoined = await _classStudentRepository
-                .IsStudentAlreadyJoinedAsync(existing.ClassId!.Value, existing.SenderId!.Value, cancellationToken);
+            // 4️⃣ Check if already joined
+            if (existing.ClassId == null || existing.SenderId == null)
+                throw new BadRequestException("Invalid class or student information.");
 
-            // 4️⃣ Add student to class if not already joined
+            var alreadyJoined = await _classStudentRepository
+                .IsStudentAlreadyJoinedAsync(existing.ClassId.Value, existing.SenderId.Value, cancellationToken);
+
+            // 5️⃣ Add student ONLY if not already joined
             if (!alreadyJoined)
             {
                 var cs = new ClassStudent
                 {
-                    ClassId = existing.ClassId!.Value,
-                    UserId = existing.SenderId!.Value,
+                    ClassId = existing.ClassId.Value,
+                    UserId = existing.SenderId.Value,
                     JoinDate = DateTime.UtcNow,
                     StudentStatus = "Active"
                 };
+
                 await _classStudentRepository.CreateAsync(cs);
             }
 
-            // 5️⃣ Save all changes in a single transaction
+            // 6️⃣ Save all changes
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            // 6️⃣ Return response
+            // 7️⃣ Return response DTO
             return new ApproveRequestDto
             {
                 NotificationId = existing.NotificationId,
@@ -69,4 +73,3 @@ namespace Learnable.Application.Features.RequestNotification.Commands.Approve
         }
     }
 }
-
