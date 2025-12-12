@@ -1,4 +1,5 @@
 ﻿using Learnable.Application.Common.Dtos;
+using Learnable.Application.Common.Exceptions;
 using Learnable.Application.Common.Extensions;
 using Learnable.Application.Interfaces.Repositories;
 using Learnable.Application.Interfaces.Repositories.Generic;
@@ -36,10 +37,10 @@ namespace Learnable.Application.Features.Account.Commands.RegisterUser
 
             // ---------------- OTP VALIDATION ----------------
             var otpRecord = await _userRepo.GetOtpByEmailAsync(dto.Email, cancellationToken)
-                ?? throw new Exception("OTP not generated. Please request OTP first.");
+                ?? throw new BadRequestException("OTP not generated. Please request OTP first.");
 
             if (otpRecord.ExpiresAt < DateTime.UtcNow)
-                throw new Exception("OTP expired. Please request a new OTP.");
+                throw new BadRequestException("OTP expired. Please request a new OTP.");
 
             if (otpRecord.OtpCode != request.OtpCode)
             {
@@ -60,21 +61,21 @@ namespace Learnable.Application.Features.Account.Commands.RegisterUser
                         $"<h2>Your new OTP is <b>{newOtp}</b></h2>",
                         cancellationToken);
 
-                    throw new Exception("OTP incorrect 3 times. New OTP sent.");
+                    throw new BadRequestException("OTP incorrect 3 times. New OTP sent.");
                 }
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
-                throw new Exception($"Incorrect OTP. Attempt {otpRecord.Attempts} of 3.");
+                throw new BadRequestException($"Incorrect OTP. Attempt {otpRecord.Attempts} of 3.");
             }
 
             await _userRepo.DeleteOtpAsync(otpRecord, cancellationToken);
 
             // ---------------- EMAIL + USERNAME VALIDATION ----------------
             if (await _userRepo.ExistsByEmailAsync(dto.Email, cancellationToken))
-                throw new Exception("Email already registered.");
+                throw new BadRequestException("Email already registered.");
 
             if (await _userRepo.ExistsByUsernameAsync(dto.Username, cancellationToken))
-                throw new Exception("Username already taken.");
+                throw new BadRequestException("Username already taken.");
 
             // ---------------- CREATE USER ----------------
             _passwordService.CreatePasswordHash(dto.Password, out string hash, out string salt);

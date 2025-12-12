@@ -28,8 +28,6 @@ namespace Learnable.Infrastructure.Implementations.Services.External
             // Groq API URL
             _apiUrl = "https://api.groq.com/openai/v1/chat/completions";
 
-            // ❌ பழையது (இதை நீக்கவும்):
-            // _model = "llama3-70b-8192";
 
             // ✅ புதியது (இதை சேர்க்கவும்):
             _model = "llama-3.3-70b-versatile";
@@ -40,14 +38,15 @@ namespace Learnable.Infrastructure.Implementations.Services.External
 
         public async Task<List<string>> ExplainText(ExplainDto dto)
         {
-            if (string.IsNullOrWhiteSpace(dto.text))
-                throw new System.Exception("Text cannot be empty.");
+            // Safe null/empty check
+            if (dto == null || string.IsNullOrWhiteSpace(dto.text))
+            {
+                return new List<string> { "Input text cannot be empty." };
+            }
 
-            // Prompt
             string prompt = "<TASK> Explain this text in exactly 10 bullet points. Each bullet point should be around 50 words. Do not include introduction or summary. Write clearly and concisely.</TASK>" +
                             "<INPUT>" + dto.text + "</INPUT>";
 
-            // Request Body Creation (OpenAI/Groq Format)
             var body = new
             {
                 model = _model,
@@ -61,36 +60,41 @@ namespace Learnable.Infrastructure.Implementations.Services.External
             var json = JsonSerializer.Serialize(body);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            // API Call (Key is already in Header, so just POST to URL)
-            var response = await _httpClient.PostAsync(_apiUrl, content);
-            var result = await response.Content.ReadAsStringAsync();
-
-            // Error Handling
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new System.Exception($"Groq API Error: {response.StatusCode} - {result}");
-            }
-
-            // JSON Parsing (OpenAI/Groq Response Format)
-            using var doc = JsonDocument.Parse(result);
+            HttpResponseMessage response;
 
             try
             {
-                // OpenAI format: choices[0].message.content
+                response = await _httpClient.PostAsync(_apiUrl, content);
+            }
+            catch (HttpRequestException ex)
+            {
+                // Network/HTTP errors handled safely
+                return new List<string> { $"Error connecting to Groq API: {ex.Message}" };
+            }
+
+            string result = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                // Safe return for middleware
+                return new List<string> { $"Groq API returned error {response.StatusCode}: {result}" };
+            }
+
+            try
+            {
+                using var doc = JsonDocument.Parse(result);
+
                 if (!doc.RootElement.TryGetProperty("choices", out var choices) || choices.GetArrayLength() == 0)
-                {
                     return new List<string> { "No explanation generated." };
-                }
 
                 string? text = choices[0]
                     .GetProperty("message")
                     .GetProperty("content")
                     .GetString();
 
-                if (string.IsNullOrEmpty(text))
-                    return new List<string>();
+                if (string.IsNullOrWhiteSpace(text))
+                    return new List<string> { "No explanation generated." };
 
-                // Formatting the list
                 var lines = text.Split('\n')
                                 .Where(x => !string.IsNullOrWhiteSpace(x))
                                 .Select(x => x.Trim('-', '•', '*', ' '))
@@ -98,9 +102,9 @@ namespace Learnable.Infrastructure.Implementations.Services.External
 
                 return lines;
             }
-            catch (System.Exception ex)
+            catch (JsonException)
             {
-                throw new System.Exception($"Error parsing Groq response: {ex.Message}");
+                return new List<string> { "Error parsing Groq API response." };
             }
         }
     }

@@ -1,11 +1,10 @@
 ﻿using FluentValidation;
-using Learnable.Domain.Errors;
+using Learnable.Application.Common.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Learnable.WebApi.Middlewares
 {
@@ -33,54 +32,83 @@ namespace Learnable.WebApi.Middlewares
             }
             catch (ValidationException ex)
             {
-                _logger.LogWarning("Validation failed: {Errors}", ex.Errors);
-
-                var response = new ApiException(
-                    (int)HttpStatusCode.BadRequest,
-                    "Validation failed",
-                    string.Join("; ", ex.Errors.Select(e => e.ErrorMessage))
-                );
-
-                context.Response.StatusCode = response.StatusCode;
+                // 400 BadRequest
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 context.Response.ContentType = "application/json";
 
                 await context.Response.WriteAsync(JsonSerializer.Serialize(new
                 {
                     errors = ex.Errors
-                                .GroupBy(e => e.PropertyName)
-                                .ToDictionary(
-                                    g => g.Key,
-                                    g => g.Select(e => e.ErrorMessage).ToArray()
-                                )
+                        .GroupBy(e => e.PropertyName)
+                        .ToDictionary(
+                            g => g.Key,
+                            g => g.Select(e => e.ErrorMessage).ToArray()
+                        )
                 }));
+
+                return;
+            }
+            catch (BadRequestException ex)
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsync(JsonSerializer.Serialize(new
+                {
+                    message = ex.Message
+                }));
+                return;
+            }
+
+            catch (UnauthorizedAccessException ex)
+            {
+                // 401 Unauthorized
+                context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                context.Response.ContentType = "application/json";
+
+                await context.Response.WriteAsync(JsonSerializer.Serialize(new
+                {
+                    message = ex.Message
+                }));
+
+                return;
+            }
+            catch (KeyNotFoundException ex)
+            {
+                // 404 Not Found
+                context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                context.Response.ContentType = "application/json";
+
+                await context.Response.WriteAsync(JsonSerializer.Serialize(new
+                {
+                    message = ex.Message
+                }));
+
+                return;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unhandled exception occurred");
+                // 500 Internal Server Error
+                _logger.LogError(ex, "Unhandled exception");
 
-                var response = new ApiException(
-                    (int)HttpStatusCode.InternalServerError,
-                    ex.Message,
-                    ex.StackTrace
-                );
-
-                context.Response.StatusCode = response.StatusCode;
+                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 context.Response.ContentType = "application/json";
 
-                // Dev vs Prod JSON formatting
-                await context.Response.WriteAsync(
-                    _env.IsDevelopment()
-                    ? JsonSerializer.Serialize(new
+                if (_env.IsDevelopment())
+                {
+                    await context.Response.WriteAsync(JsonSerializer.Serialize(new
                     {
-                        response.StatusCode,
-                        response.Message,
-                        response.Details
-                    })
-                    : JsonSerializer.Serialize(new
+                        status = 500,
+                        error = ex.Message,
+                        stackTrace = ex.StackTrace
+                    }));
+                }
+                else
+                {
+                    await context.Response.WriteAsync(JsonSerializer.Serialize(new
                     {
                         message = "An unexpected error occurred."
-                    })
-                );
+                    }));
+                }
             }
         }
     }
