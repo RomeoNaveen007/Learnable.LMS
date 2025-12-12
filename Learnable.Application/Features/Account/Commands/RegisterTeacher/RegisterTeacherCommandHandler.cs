@@ -37,12 +37,12 @@ namespace Learnable.Application.Features.Account.Commands.RegisterTeacher
             // 1. Load existing user
             var user = await _userRepo.GetUserByIdAsync(dto.UserId, cancellationToken);
             if (user == null)
-                throw new Exception("User does not exist.");
+                throw new KeyNotFoundException("User does not exist.");
 
             // 2. Ensure teacher profile does not already exist
             var existingTeacher = await _teacherRepo.GetByUserIdAsync(dto.UserId, cancellationToken);
             if (existingTeacher != null)
-                throw new Exception("Teacher profile already exists.");
+                throw new InvalidOperationException("Teacher profile already exists.");
 
             // 3. Update user fields
             user.Role = "Teacher";

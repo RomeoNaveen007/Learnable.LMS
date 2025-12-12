@@ -1,7 +1,18 @@
 ﻿using FluentValidation;
+using Learnable.Application;
 using Learnable.Application.Common.Behaviors;
 using Learnable.Application.Features.Account.Commands.RegisterTeacher;
+using Learnable.Application.Features.Account.Commands.RegisterUser;
 using Learnable.Application.Features.Account.Queries.LoginUser;
+using Learnable.Application.Features.Asset.Commands.AddAsset;
+using Learnable.Application.Features.Asset.Queries.GetAssetByID_;
+using Learnable.Application.Features.Class.Commands.AddClass;
+using Learnable.Application.Features.Class.Commands.DeleteClass;
+using Learnable.Application.Features.Class.Commands.UpdateClass;
+using Learnable.Application.Features.Class.Queries.GetById;
+using Learnable.Application.Features.Class.Queries.GetByUnicName;
+using Learnable.Application.Features.Exam.Commands.Create;
+using Learnable.Application.Features.Exam.Commands.Delete;
 using Learnable.Application.Interfaces.Repositories;
 using Learnable.Application.Interfaces.Repositories.Generic;
 using Learnable.Application.Interfaces.Services;
@@ -40,11 +51,6 @@ namespace Learnable.Infrastructure
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IPasswordService, PasswordService>();
 
-
-
-
-
-
             //apiservices
             services.AddScoped<IAiApiService, AiApiService>();
 
@@ -53,15 +59,6 @@ namespace Learnable.Infrastructure
 
             //exam ai service
             services.AddScoped<IExamAiApiService, ExamAiApiService>();
-
-
-
-
-
-
-
-
-            
 
             // Generic repository
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -99,19 +96,9 @@ namespace Learnable.Infrastructure
             // Asset Repository
             services.AddScoped<IAssetReopsitory, AssetReopsitory>();
 
-            // Pipeline behaviors
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ExceptionBehavior<,>));
-
-            // FluentValidation
-            services.AddValidatorsFromAssembly(typeof(LoginQueryValidator).Assembly);
-           
-            // MediatR Handlers
-            services.AddMediatR(cfg =>
-            {
-                cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly);
-            });
             services.AddTransient<Seed>();
+
+            services.AddApplication();
 
             return services;
         }

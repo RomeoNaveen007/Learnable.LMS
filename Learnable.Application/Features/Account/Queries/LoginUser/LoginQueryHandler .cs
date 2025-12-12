@@ -25,7 +25,7 @@ namespace Learnable.Application.Features.Account.Queries.LoginUser
             // 1. Find user by email
             var user = await _userRepository.GetByEmailAsync(request.Email, cancellationToken);
             if (user == null)
-                throw new Exception("Invalid email or password.");
+                throw new UnauthorizedAccessException("Invalid email address.");
 
             // 2. Verify password
             var passwordOk = _passwordService.VerifyPassword(
@@ -34,7 +34,7 @@ namespace Learnable.Application.Features.Account.Queries.LoginUser
                 user.PasswordSalt);
 
             if (!passwordOk)
-                throw new Exception("Invalid email or password.");
+                throw new UnauthorizedAccessException("Invalid password.");
 
             TeacherDto? teacherDto = null;
             UserWithClassesDto? studentDto = null;
