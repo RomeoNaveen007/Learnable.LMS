@@ -25,7 +25,7 @@ namespace Learnable.Application.Features.User.Queries.GetUserById
             var user = await _userRepository.GetUserByIdAsync(request.UserId, cancellationToken);
 
             if (user == null)
-                return null;
+                throw new KeyNotFoundException("User not found.");
 
             // 2. Classes List-ஐ Role-க்கு ஏற்றவாறு தயார் செய்கிறோம்
             List<ClassDto> classDtos = new();

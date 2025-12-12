@@ -15,12 +15,6 @@ namespace Learnable.Application.Features.Asset.Commands.AddAsset
                 .NotEmpty().WithMessage("Type is required.")
                 .MaximumLength(50).WithMessage("Type cannot exceed 50 characters.");
 
-            RuleFor(x => x.Url)
-                .NotEmpty().WithMessage("Url is required.")
-                .MaximumLength(500).WithMessage("Url cannot exceed 500 characters.")
-                .Must(uri => Uri.IsWellFormedUriString(uri, UriKind.Absolute))
-                .WithMessage("Url must be a valid absolute URL.");
-
             RuleFor(x => x.RepoId)
                 .NotEmpty().WithMessage("RepoId is required.");
 

@@ -38,7 +38,7 @@ namespace Learnable.Application.Features.Asset.Commands.AddAsset
                 AssetsProfileId = Guid.NewGuid(),
                 Title = request.Title,
                 Type = request.Type,
-                Url = request.Url,
+                Url = "abcd",
                 RepoId = request.RepoId,
                 Description = request.Description,
                 CreatedAt = DateTime.UtcNow,

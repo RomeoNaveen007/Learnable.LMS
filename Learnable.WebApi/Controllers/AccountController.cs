@@ -19,19 +19,12 @@ namespace Learnable.WebApi.Controllers
         [HttpPost("send-otp")] //  http://localhost:5071/api/Account/send-otp
         public async Task<IActionResult> SendOtp([FromBody] SendOtpDto request)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var result = await _mediator.Send(new SendOtpCommand(request.Email));
 
             if (!result)
                 return StatusCode(500, new { message = "Failed to send OTP check the Email", success = false });
 
-            return Ok(new
-            {
-                message = "OTP sent successfully",
-                success = result    
-            });
+            return Ok(new { message = "OTP sent successfully", success = result });
         }
 
         [HttpPost("register")] //  http://localhost:5071/api/Account/register
