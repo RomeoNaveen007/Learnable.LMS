@@ -35,3 +35,5 @@ namespace Learnable.Application.Features.Class.Commands.DeleteClass
         }
     }
 }
+
+// check pannu da sariya endu
